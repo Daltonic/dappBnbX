@@ -1,6 +1,8 @@
 import Head from 'next/head'
+import { generateFakeApartment } from '@/utils/fakeData'
+import { Category, Collection } from '@/components'
 
-export default function Home() {
+export default function Home({ apartmentData }) {
   return (
     <div>
       <Head>
@@ -8,9 +10,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <h4>Hello World</h4>
-      </main>
+      <Category />
+      <Collection appartments={apartmentData} />
     </div>
   )
+}
+
+export const getServerSideProps = async () => {
+  const apartmentData = generateFakeApartment(5)
+  return {
+    props: { apartmentData: JSON.parse(JSON.stringify(apartmentData)) },
+  }
 }
