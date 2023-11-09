@@ -1,5 +1,5 @@
 import { FaAirbnb } from 'react-icons/fa'
-import { Link } from 'next/link'
+import Link from 'next/link'
 import { ConnectBtn } from '.'
 
 const Header = () => {
@@ -48,7 +48,7 @@ const ButtonGroup = () => {
         >
           Customers
         </button>
-        <Link to={'/addRoom'}>
+        <Link href={'/addRoom'}>
           <button
             type="button"
             className="
