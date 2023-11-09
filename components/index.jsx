@@ -10,6 +10,7 @@ import Description from './Description'
 import ImageGrid from './ImageGrid'
 import Actions from './Actions'
 import Banner from './Banner'
+import Booking from './Booking'
 
 export {
   Header,
@@ -24,4 +25,5 @@ export {
   ImageGrid,
   Actions,
   Banner,
+  Booking,
 }

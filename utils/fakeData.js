@@ -71,7 +71,7 @@ export const generateFakeApartment = (count) => {
   return apartments
 }
 
-export const generateFakeBooking = (count) => {
+export const generateFakeBookings = (count) => {
   const bookings = []
   for (let i = 0; i < count; i++) {
     const id = i + 1
