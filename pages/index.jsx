@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { generateFakeApartment } from '@/utils/fakeData'
 import { Category, Collection } from '@/components'
 
-export default function Home({ apartmentData }) {
+export default function Home({ apartmentsData }) {
   return (
     <div>
       <Head>
@@ -11,14 +11,14 @@ export default function Home({ apartmentData }) {
       </Head>
 
       <Category />
-      <Collection appartments={apartmentData} />
+      <Collection appartments={apartmentsData} />
     </div>
   )
 }
 
 export const getServerSideProps = async () => {
-  const apartmentData = generateFakeApartment(5)
+  const apartmentsData = generateFakeApartment(5)
   return {
-    props: { apartmentData: JSON.parse(JSON.stringify(apartmentData)) },
+    props: { apartmentsData: JSON.parse(JSON.stringify(apartmentsData)) },
   }
 }

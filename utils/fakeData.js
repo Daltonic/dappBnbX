@@ -36,7 +36,7 @@ export const generateFakeApartment = (count) => {
   for (let i = 0; i < count; i++) {
     const id = i + 1
     const name = faker.word.words(5)
-    const deleted = false
+    const deleted = faker.datatype.boolean()
     const description = faker.lorem.paragraph()
     const price = faker.number.float({
       min: 0.1,
@@ -70,3 +70,71 @@ export const generateFakeApartment = (count) => {
 
   return apartments
 }
+
+export const generateFakeBooking = (count) => {
+  const bookings = []
+  for (let i = 0; i < count; i++) {
+    const id = i + 1
+    const tenant = faker.string.hexadecimal({
+      length: { min: 42, max: 42 },
+      prefix: '0x',
+    })
+    const date = faker.date.past().getTime()
+    const price = faker.number.float({
+      min: 0.1,
+      max: 3.5,
+      precision: 0.01,
+    })
+    const checked = faker.datatype.boolean()
+    const cancelled = faker.datatype.boolean()
+
+    const booking = {
+      id,
+      tenant,
+      date,
+      price,
+      checked,
+      cancelled,
+    }
+
+    bookings.push(booking)
+  }
+
+  return bookings
+}
+
+export const generateFakeReviews = (count) => {
+  const reviews = []
+  for (let i = 0; i < count; i++) {
+    const id = i + 1
+    const appartmentId = faker.number.int({ min: 1, max: 999 })
+    const rating = faker.number.int({ min: 1, max: 5 })
+    const text = faker.lorem.sentence()
+    const timestamp = faker.date.past().getTime()
+    const owner = faker.string.hexadecimal({
+      length: { min: 42, max: 42 },
+      prefix: '0x',
+    })
+
+    const review = {
+      id,
+      appartmentId,
+      rating,
+      text,
+      owner,
+      timestamp,
+    }
+
+    reviews.push(review)
+  }
+
+  return reviews
+}
+
+// struct ReviewStruct {
+//   uint id;
+//   uint appartmentId;
+//   string reviewText;
+//   uint timestamp;
+//   address owner;
+// }
