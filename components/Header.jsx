@@ -16,7 +16,6 @@ const Header = () => {
       </Link>
 
       <ButtonGroup />
-
       <ConnectBtn />
     </header>
   )
@@ -48,7 +47,7 @@ const ButtonGroup = () => {
         >
           Customers
         </button>
-        <Link href={'/addRoom'}>
+        <Link href={'/room/add'}>
           <button
             type="button"
             className="

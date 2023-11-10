@@ -1,3 +1,7 @@
+import 'swiper/css'
+import 'swiper/css/pagination'
+import 'swiper/css/navigation'
+import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Navigation } from 'swiper'
 
@@ -19,10 +23,18 @@ const ImageSlider = ({ images }) => {
     >
       {images.map((url, i) => (
         <SwiperSlide key={i}>
-          <img className="w-full" src={url} alt={'image slide ' + i} />
+          <SlideImage src={url} alt={'image slide ' + i} />
         </SwiperSlide>
       ))}
     </Swiper>
+  )
+}
+
+const SlideImage = ({ src, alt }) => {
+  return (
+    <div className="w-full h-full relative">
+      <Image src={src} alt={alt} fill objectFit="cover" sizes="100vw" />
+    </div>
   )
 }
 
