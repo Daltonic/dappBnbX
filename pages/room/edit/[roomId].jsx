@@ -3,17 +3,18 @@ import { FaTimes } from 'react-icons/fa'
 import { truncate } from '@/store'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
+import { generateFakeApartment } from '@/utils/fakeData'
 import { useAccount } from 'wagmi'
 
-export default function Add() {
+export default function Edit({ appartment }) {
   const { address } = useAccount()
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [location, setLocation] = useState('')
-  const [rooms, setRooms] = useState('')
+  const [name, setName] = useState(appartment.name)
+  const [description, setDescription] = useState(appartment.description)
+  const [location, setLocation] = useState(appartment.location)
+  const [rooms, setRooms] = useState(appartment.rooms)
   const [images, setImages] = useState('')
-  const [price, setPrice] = useState('')
-  const [links, setLinks] = useState([])
+  const [price, setPrice] = useState(appartment.price)
+  const [links, setLinks] = useState(appartment.images)
   const navigate = useRouter()
 
   const handleSubmit = async (e) => {
@@ -59,12 +60,22 @@ export default function Add() {
     setLinks(() => [...links])
   }
 
+  const onReset = () => {
+    setName('')
+    setDescription('')
+    setLocation('')
+    setRooms('')
+    setPrice('')
+    setImages('')
+    setLinks([])
+  }
+
   return (
     <div className="h-screen flex justify-center mx-auto">
       <div className="w-11/12 md:w-2/5 h-7/12 p-6">
         <form onSubmit={handleSubmit} className="flex flex-col">
           <div className="flex justify-center items-center">
-            <p className="font-semibold text-black">Add Room</p>
+            <p className="font-semibold text-black">Edit Room</p>
           </div>
 
           <div className="flex flex-row justify-between items-center border border-gray-300 p-2 rounded-xl mt-5">
@@ -207,10 +218,20 @@ export default function Add() {
             }`}
             disabled={!address}
           >
-            Add Appartment
+            Update Appartment
           </button>
         </form>
       </div>
     </div>
   )
+}
+
+export const getServerSideProps = async (context) => {
+  const { roomId } = context.query
+  const appartment = generateFakeApartment(roomId)[0]
+  return {
+    props: {
+      appartment: JSON.parse(JSON.stringify(appartment)),
+    },
+  }
 }

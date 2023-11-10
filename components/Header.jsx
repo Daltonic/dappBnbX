@@ -24,16 +24,15 @@ const Header = () => {
 const ButtonGroup = () => {
   return (
     <div
-      className="md:flex hidden items-center justify-center shadow-gray-400
-      shadow-sm overflow-hidden rounded-full cursor-pointer"
+      className="md:flex hidden items-center justify-center border-gray-300
+      border overflow-hidden rounded-full cursor-pointer"
     >
       <div className="inline-flex" role="group">
         <button
           className="
             rounded-l-full
             px-5
-            md:py-2 py-1 
-            border border-slate-200
+            py-3
             text-[#ff385c]
             font-medium
             text-sm
@@ -45,15 +44,15 @@ const ButtonGroup = () => {
             ease-in-out
           "
         >
-          Customers
+          Anywhere
         </button>
         <Link href={'/room/add'}>
           <button
             type="button"
             className="
               px-5
-              md:py-2 py-1 
-              border border-slate-200
+              py-3 
+              border-x border-gray-300
               text-[#ff385c]
               font-medium
               text-sm
@@ -73,8 +72,7 @@ const ButtonGroup = () => {
           className="
             rounded-r-full
             px-5
-            md:py-2 py-1 
-            border border-slate-200
+            py-3
             text-[#ff385c]
             font-medium
             text-sm
@@ -86,7 +84,7 @@ const ButtonGroup = () => {
             ease-in-out
           "
         >
-          <p className="flex items-center">Chats</p>
+          <p className="flex items-center">Any week</p>
         </button>
       </div>
     </div>
