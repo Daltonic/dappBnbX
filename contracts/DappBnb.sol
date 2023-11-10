@@ -243,14 +243,14 @@ contract DappBnb is Ownable, ReentrancyGuard {
 
   function getQualifiedReviewers(uint aid) public view returns (address[] memory Tenants) {
     uint256 available;
-    for (uint i = 1; i <= bookingsOf[aid].length; i++) {
+    for (uint i = 0; i < bookingsOf[aid].length; i++) {
       if (bookingsOf[aid][i].checked) available++;
     }
 
     Tenants = new address[](available);
 
     uint256 index;
-    for (uint i = 1; i <= bookingsOf[aid].length; i++) {
+    for (uint i = 0; i < bookingsOf[aid].length; i++) {
       if (bookingsOf[aid][i].checked) {
         Tenants[index++] = bookingsOf[aid][i].tenant;
       }
