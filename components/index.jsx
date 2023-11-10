@@ -9,8 +9,10 @@ import Calendar from './Calendar'
 import Description from './Description'
 import ImageGrid from './ImageGrid'
 import Actions from './Actions'
-import Banner from './Banner'
+import Title from './Title'
 import Booking from './Booking'
+import Footer from './Footer'
+import AddReview from './AddReview'
 
 export {
   Header,
@@ -24,6 +26,8 @@ export {
   Description,
   ImageGrid,
   Actions,
-  Banner,
+  Title,
   Booking,
+  Footer,
+  AddReview,
 }

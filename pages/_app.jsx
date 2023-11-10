@@ -5,7 +5,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useEffect, useState } from 'react'
 import { Providers } from '@/services/provider'
-import { Header } from '@/components'
+import { Footer, Header } from '@/components'
 
 export default function App({ Component, pageProps }) {
   const [showChild, setShowChild] = useState(false)
@@ -23,6 +23,7 @@ export default function App({ Component, pageProps }) {
           <Header />
           <Component {...pageProps} />
           <div className="h-20"></div>
+          <Footer />
         </div>
 
         <ToastContainer

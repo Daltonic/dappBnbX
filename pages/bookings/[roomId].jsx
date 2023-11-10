@@ -83,8 +83,9 @@ const Bookings = ({ appartment, bookings }) => {
 
 export default Bookings
 
-export const getServerSideProps = async () => {
-  const appartment = generateFakeApartment(1)[0]
+export const getServerSideProps = async (context) => {
+  const { roomId } = context.query
+  const appartment = generateFakeApartment(roomId)[0]
   const bookings = generateFakeBookings(5)
   return {
     props: {
