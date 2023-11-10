@@ -1,16 +1,7 @@
-'use client'
-
-import * as React from 'react'
-import {
-  GetSiweMessageOptions,
-  RainbowKitSiweNextAuthProvider,
-} from '@rainbow-me/rainbowkit-siwe-next-auth'
+import React, { useState, useEffect } from 'react'
+import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import { WagmiConfig, configureChains, createConfig } from 'wagmi'
-import {
-  RainbowKitProvider,
-  connectorsForWallets,
-  darkTheme,
-} from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, connectorsForWallets, darkTheme } from '@rainbow-me/rainbowkit'
 import {
   metaMaskWallet,
   trustWallet,
@@ -20,18 +11,14 @@ import {
 import { mainnet, polygonMumbai, sepolia, hardhat } from 'wagmi/chains'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
-import { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 
 const { chains, publicClient } = configureChains(
   [mainnet, polygonMumbai, sepolia, hardhat],
-  [
-    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID as string }),
-    publicProvider(),
-  ]
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID }), publicProvider()]
 )
 
-const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
+const projectId = process.env.NEXT_PUBLIC_PROJECT_ID
 
 const connectors = connectorsForWallets([
   {
@@ -52,38 +39,24 @@ const wagmiConfig = createConfig({
 })
 
 const demoAppInfo = {
-  appName: 'CrowdFunding dApp',
+  appName: 'DappBnb dApp',
 }
 
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
+const getSiweMessageOptions = () => ({
   statement: `
   Once you're signed in, you'll be able to access all of our dApp's features.
-  Thank you for partnering with CrowdFunding!`,
+  Thank you for partnering with DappBnb!`,
 })
 
-export function Providers({
-  children,
-  pageProps,
-}: {
-  children: React.ReactNode
-  pageProps: {
-    session: Session
-  }
-}) {
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
+const Providers = ({ children, pageProps }) => {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   return (
     <WagmiConfig config={wagmiConfig}>
       <SessionProvider refetchInterval={0} session={pageProps.session}>
-        <RainbowKitSiweNextAuthProvider
-          getSiweMessageOptions={getSiweMessageOptions}
-        >
-          <RainbowKitProvider
-            theme={darkTheme()}
-            chains={chains}
-            appInfo={demoAppInfo}
-          >
+        <RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
+          <RainbowKitProvider theme={darkTheme()} chains={chains} appInfo={demoAppInfo}>
             {mounted && children}
           </RainbowKitProvider>
         </RainbowKitSiweNextAuthProvider>
@@ -91,3 +64,5 @@ export function Providers({
     </WagmiConfig>
   )
 }
+
+export default Providers

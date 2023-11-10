@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useEffect, useState } from 'react'
-import { Providers } from '@/services/provider'
+import Providers from '@/services/provider'
 import { Footer, Header } from '@/components'
 
 export default function App({ Component, pageProps }) {
