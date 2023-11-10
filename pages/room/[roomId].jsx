@@ -1,7 +1,8 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { getApartment } from '@/services/blockchain'
+import { generateFakeReviews } from '@/utils/fakeData'
 import { useGlobalState, setGlobalState } from '@/store'
-import { generateFakeApartment, generateFakeReviews } from '@/utils/fakeData'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
 
 export default function Room({ appartment, reviews }) {
@@ -61,7 +62,7 @@ export default function Room({ appartment, reviews }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const appartment = generateFakeApartment(roomId)[0]
+  const appartment = await getApartment(roomId)
   const reviews = generateFakeReviews(5)
   return {
     props: {

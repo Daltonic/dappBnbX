@@ -3,7 +3,7 @@ import { getCsrfToken } from 'next-auth/react'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import NextAuth from 'next-auth/next'
 
-export default async function auth(req: any, res: any) {
+export default async function auth(req, res) {
   const providers = [
     CredentialsProvider({
       name: 'Ethereum',
@@ -11,18 +11,18 @@ export default async function auth(req: any, res: any) {
         message: {
           label: 'Message',
           type: 'text',
-          placejolder: '0x0',
+          placeholder: '0x0',
         },
         signature: {
           label: 'Signature',
           type: 'text',
-          placejolder: '0x0',
+          placeholder: '0x0',
         },
       },
       async authorize(credentials) {
         try {
           const siwe = new SiweMessage(JSON.parse(credentials?.message || '{}'))
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL as string)
+          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL)
 
           const result = await siwe.verify({
             signature: credentials?.signature || '',
@@ -44,8 +44,7 @@ export default async function auth(req: any, res: any) {
     }),
   ]
 
-  const isDefaultSigninPage =
-    req.method === 'GET' && req.query.nextauth.includes('signin')
+  const isDefaultSigninPage = req.method === 'GET' && req.query.nextauth.includes('signin')
 
   if (isDefaultSigninPage) providers.pop()
 
@@ -56,7 +55,7 @@ export default async function auth(req: any, res: any) {
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-      async session({ session, token }: { session: any; token: any }) {
+      async session({ session, token }) {
         session.address = token.sub
         session.user.name = token.sub
         session.user.image = 'https://www.fillmurray.com/128/128'

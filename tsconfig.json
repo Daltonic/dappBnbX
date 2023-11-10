@@ -32,5 +32,5 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "components/ConnectBtn.jsx", "components/ConnectBtn.jsx", "pages/index.jsx", "pages/index.jsx", "pages/_app.jsx", "pages/_app.jsx", "services/provider.jsx"  ]
+, "components/ConnectBtn.jsx", "components/ConnectBtn.jsx", "pages/index.jsx", "pages/index.jsx", "pages/_app.jsx", "pages/_app.jsx", "services/provider.jsx", "pages/api/auth/[...nextauth].js"  ]
 }
