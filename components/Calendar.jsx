@@ -106,7 +106,7 @@ const Calendar = ({ price, id }) => {
         Book
       </button>
 
-      <Link href={`/bookings/${id}`} className="text-pink-500">
+      <Link href={`/room/bookings/${id}`} className="text-pink-500">
         Check your bookings
       </Link>
     </form>

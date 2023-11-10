@@ -1,8 +1,8 @@
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { Booking } from '@/components'
-import { generateFakeApartment, generateFakeBookings } from '@/utils/fakeData'
+import { useRouter } from 'next/router'
+import { getBookings, getApartment } from '@/services/blockchain'
 
 const Bookings = ({ appartment, bookings }) => {
   //   const [loaded, setLoaded] = useState(false)
@@ -48,16 +48,14 @@ const Bookings = ({ appartment, bookings }) => {
 
   return (
     <div className="w-full sm:w-3/5 mx-auto mt-8">
-      {appartment?.owner != address?.toLowerCase() && (
-        <h1 className="text-center text-3xl text-black font-bold">Your bookings</h1>
-      )}
-
+      <h1 className="text-center text-3xl text-black font-bold">Bookings</h1>
       {bookings.length < 1 && <div>No bookings for this appartment yet</div>}
+
       {bookings.map((booking, i) => (
         <Booking key={i} id={roomId} booking={booking} />
       ))}
 
-      {appartment?.owner == address?.toLowerCase() && (
+      {/* {appartment?.owner == address?.toLowerCase() && (
         <div className="w-full sm:w-3/5 mx-auto mt-8">
           <h1 className="text-3xl text-center font-bold">View booking requests</h1>
           {bookings.length < 1 && 'No bookings yet'}
@@ -76,7 +74,7 @@ const Bookings = ({ appartment, bookings }) => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   )
 }
@@ -85,8 +83,9 @@ export default Bookings
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const appartment = generateFakeApartment(roomId)[0]
-  const bookings = generateFakeBookings(5)
+  const appartment = await getApartment(roomId)
+  const bookings = await getBookings(roomId)
+
   return {
     props: {
       appartment: JSON.parse(JSON.stringify(appartment)),

@@ -4,12 +4,12 @@ import { useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
-const Booking = ({ booking, id }) => {
+const Booking = ({ booking }) => {
   const { address } = useAccount()
 
   //   useEffect(async () => {
   //     const params = {
-  //       id,
+  //       booking.aid,
   //       bookingId: booking.id,
   //     }
   //     await hasBookedDateReached(params)
@@ -18,9 +18,9 @@ const Booking = ({ booking, id }) => {
   const handleCheckIn = async () => {
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await checkInApartment(id, booking.id)
+        // await checkInApartment(booking.aid, booking.id)
         //   .then(async () => {
-        //     await getBookings(id)
+        //     await getBookings(booking.aid)
         //     resolve()
         //   })
         //   .catch(() => reject())
@@ -35,7 +35,7 @@ const Booking = ({ booking, id }) => {
 
   const handleRefund = async () => {
     const params = {
-      id,
+      id: booking.aid,
       bookingId: booking.id,
       date: new Date(booking.date).getTime(),
     }
@@ -68,7 +68,7 @@ const Booking = ({ booking, id }) => {
   //   booking.tenant != address.toLowerCase() || booking.cancelled == true ? null :
   return (
     <div className="w-full flex justify-between items-center my-3 bg-gray-100 p-3">
-      <Link className=" font-medium underline" href={'/room/' + id}>
+      <Link className=" font-medium underline" href={'/room/' + booking.aid}>
         {formatDate(booking.date)}
       </Link>
       {bookedDayStatus(booking) ? (

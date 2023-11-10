@@ -40,6 +40,12 @@ const getApartment = async (id) => {
   return structureAppartments([apartment])[0]
 }
 
+const getBookings = async (id) => {
+  const contract = await getEthereumContracts()
+  const bookings = await contract.getBookings(id)
+  return structuredBookings(bookings)
+}
+
 const structureAppartments = (appartments) =>
   appartments.map((appartment) => ({
     id: Number(appartment.id),
@@ -54,4 +60,15 @@ const structureAppartments = (appartments) =>
     booked: appartment.booked,
   }))
 
-export { getApartments, getApartment }
+const structuredBookings = (bookings) =>
+  bookings.map((booking) => ({
+    id: Number(booking.id),
+    aid: Number(booking.aid),
+    tenant: booking.tenant.toLowerCase(),
+    date: Number(booking.date),
+    price: fromWei(booking.price),
+    checked: booking.checked,
+    cancelled: booking.cancelled,
+  }))
+
+export { getApartments, getApartment, getBookings }
