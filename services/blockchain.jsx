@@ -46,12 +46,64 @@ const getBookings = async (id) => {
   return structuredBookings(bookings)
 }
 
+const createApartment = async (apartment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.createAppartment(
+      apartment.name,
+      apartment.description,
+      apartment.location,
+      apartment.images,
+      apartment.rooms,
+      toWei(apartment.price)
+    )
+    await tx.wait()
+
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const updateApartment = async (apartment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.updateAppartment(
+      apartment.id,
+      apartment.name,
+      apartment.description,
+      apartment.location,
+      apartment.images,
+      apartment.rooms,
+      toWei(apartment.price)
+    )
+    await tx.wait()
+
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const structureAppartments = (appartments) =>
   appartments.map((appartment) => ({
     id: Number(appartment.id),
     name: appartment.name,
-    owner: appartment.owner.toLowerCase(),
+    owner: appartment.owner,
     description: appartment.description,
+    location: appartment.location,
     price: fromWei(appartment.price),
     deleted: appartment.deleted,
     images: appartment.images.split(','),
@@ -64,11 +116,11 @@ const structuredBookings = (bookings) =>
   bookings.map((booking) => ({
     id: Number(booking.id),
     aid: Number(booking.aid),
-    tenant: booking.tenant.toLowerCase(),
+    tenant: booking.tenant,
     date: Number(booking.date),
     price: fromWei(booking.price),
     checked: booking.checked,
     cancelled: booking.cancelled,
   }))
 
-export { getApartments, getApartment, getBookings }
+export { getApartments, getApartment, getBookings, createApartment, updateApartment }

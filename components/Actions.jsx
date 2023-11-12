@@ -33,7 +33,7 @@ const Actions = ({ id, owner }) => {
       {address == owner && (
         <>
           <Link
-            href={'/editRoom/' + id}
+            href={'/room/edit/' + id}
             className="p-2 rounded-md shadow-lg border-[0.1px]
               border-gray-500 flex justify-start items-center space-x-1
               bg-gray-500 hover:bg-transparent hover:text-gray-500 text-white"

@@ -52,7 +52,7 @@ const Bookings = ({ appartment, bookings }) => {
       {bookings.length < 1 && <div>No bookings for this appartment yet</div>}
 
       {bookings.map((booking, i) => (
-        <Booking key={i} id={roomId} booking={booking} />
+        <Booking key={i} id={roomId} booking={booking} appartment={appartment} />
       ))}
 
       {/* {appartment?.owner == address?.toLowerCase() && (

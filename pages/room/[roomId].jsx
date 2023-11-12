@@ -32,7 +32,7 @@ export default function Room({ appartment, reviews }) {
           fifth={appartment?.images[4]}
         />
 
-        <Description description={appartment?.description} />
+        <Description description={appartment?.description} location={appartment?.location} />
         <Calendar price={appartment?.price} id={roomId} />
         <Actions id={appartment?.id} owner={appartment?.owner} />
 

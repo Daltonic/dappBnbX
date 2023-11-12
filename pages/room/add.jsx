@@ -4,6 +4,7 @@ import { truncate } from '@/store'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
+import { createApartment } from '@/services/blockchain'
 
 export default function Add() {
   const { address } = useAccount()
@@ -21,8 +22,9 @@ export default function Add() {
     if (!name || !location || !description || !rooms || links.length != 5 || !price) return
 
     const params = {
-      name: `${name}, ${location}`,
+      name,
       description,
+      location,
       rooms,
       images: links.slice(0, 5).join(','),
       price,
@@ -30,14 +32,12 @@ export default function Add() {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await createAppartment(params)
-        //   .then(async () => {
-        //     onReset()
-        //     navigate.push('/')
-        //     loadAppartments()
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await createApartment(params)
+          .then(async () => {
+            navigate.push('/')
+            resolve()
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',

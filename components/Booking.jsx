@@ -1,6 +1,5 @@
 import { formatDate } from '@/utils/helper'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
 
@@ -65,16 +64,29 @@ const Booking = ({ booking }) => {
     return bookedDayStatus
   }
 
-  //   booking.tenant != address.toLowerCase() || booking.cancelled == true ? null :
+  const functions = {
+    bookedDayStatus,
+    handleCheckIn,
+    handleRefund,
+  }
+
+  if (booking.tenant == address) {
+    return <TenantView booking={booking} functions={functions} />
+  } else {
+    return <DefaultView booking={booking} />
+  }
+}
+
+const TenantView = ({ booking, functions }) => {
   return (
     <div className="w-full flex justify-between items-center my-3 bg-gray-100 p-3">
       <Link className=" font-medium underline" href={'/room/' + booking.aid}>
         {formatDate(booking.date)}
       </Link>
-      {bookedDayStatus(booking) ? (
+      {functions.bookedDayStatus(booking) ? (
         <button
           className="p-2 bg-green-500 text-white rounded-full text-sm px-4"
-          onClick={handleCheckIn}
+          onClick={functions.handleCheckIn}
         >
           Check In
         </button>
@@ -85,11 +97,28 @@ const Booking = ({ booking }) => {
       ) : (
         <button
           className="p-2 bg-[#ff385c] text-white rounded-full text-sm px-4"
-          onClick={handleRefund}
+          onClick={functions.handleRefund}
         >
           Refund
         </button>
       )}
+    </div>
+  )
+}
+
+const DefaultView = ({ booking }) => {
+  return (
+    <div className="w-full flex justify-between items-center my-3 bg-gray-100 p-3">
+      <Link className=" font-medium underline" href={'/room/' + booking.aid}>
+        {formatDate(booking.date)}
+      </Link>
+
+      <button
+        className="p-2 bg-pink-500 text-white font-medium
+      italic rounded-full text-sm px-4"
+      >
+        Booked
+      </button>
     </div>
   )
 }

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { FaTimes } from 'react-icons/fa'
 import { truncate } from '@/store'
+import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
-import { generateFakeApartment } from '@/utils/fakeData'
-import { useAccount } from 'wagmi'
+import { FaTimes } from 'react-icons/fa'
+import { getApartment, updateApartment } from '@/services/blockchain'
 
 export default function Edit({ appartment }) {
   const { address } = useAccount()
@@ -22,8 +22,10 @@ export default function Edit({ appartment }) {
     if (!name || !location || !description || !rooms || links.length != 5 || !price) return
 
     const params = {
-      name: `${name}, ${location}`,
+      ...appartment,
+      name,
       description,
+      location,
       rooms,
       images: links.slice(0, 5).join(','),
       price,
@@ -31,18 +33,16 @@ export default function Edit({ appartment }) {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await createAppartment(params)
-        //   .then(async () => {
-        //     onReset()
-        //     navigate.push('/')
-        //     loadAppartments()
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await updateApartment(params)
+          .then(async () => {
+            navigate.push('/room/' + appartment.id)
+            resolve()
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
-        success: 'Apartment added successfully 👌',
+        success: 'Apartment updated successfully 👌',
         error: 'Encountered error 🤯',
       }
     )
@@ -58,16 +58,6 @@ export default function Edit({ appartment }) {
   const removeImage = (index) => {
     links.splice(index, 1)
     setLinks(() => [...links])
-  }
-
-  const onReset = () => {
-    setName('')
-    setDescription('')
-    setLocation('')
-    setRooms('')
-    setPrice('')
-    setImages('')
-    setLinks([])
   }
 
   return (
@@ -228,7 +218,7 @@ export default function Edit({ appartment }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const appartment = generateFakeApartment(roomId)[0]
+  const appartment = await getApartment(roomId)
   return {
     props: {
       appartment: JSON.parse(JSON.stringify(appartment)),
