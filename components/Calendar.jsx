@@ -1,24 +1,14 @@
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { useGlobalState } from '@/store'
 import DatePicker from 'react-datepicker'
 import { FaEthereum } from 'react-icons/fa'
+import { bookApartment } from '@/services/blockchain'
+import moment from 'moment'
 
-const Calendar = ({ price, id }) => {
+const Calendar = ({ apartment, timestamps }) => {
   const [checkInDate, setCheckInDate] = useState(null)
   const [checkOutDate, setCheckOutDate] = useState(null)
-  const [timestamps] = useGlobalState('timestamps')
-
-  // useEffect(async () => await getUnavailableDates(id))
-
-  const handleCheckInDateChange = (date) => {
-    setCheckInDate(date)
-  }
-
-  const handleCheckOutDateChange = (date) => {
-    setCheckOutDate(date)
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -33,19 +23,19 @@ const Calendar = ({ price, id }) => {
     }
 
     const params = {
-      id,
-      datesArray: timestampArray,
-      amount: price * timestampArray.length,
+      aid: apartment.id,
+      timestamps: timestampArray,
+      amount: apartment.price * timestampArray.length,
     }
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await appartmentBooking(params)
-        //   .then(async () => {
-        //     resetForm()
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await bookApartment(params)
+          .then(async () => {
+            resetForm()
+            resolve()
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
@@ -71,7 +61,7 @@ const Calendar = ({ price, id }) => {
         <div className="flex justify-center items-center">
           <FaEthereum className="text-lg text-gray-500" />
           <span className="text-lg text-gray-500">
-            {price} <small>per night</small>
+            {apartment.price} <small>per night</small>
           </span>
         </div>
       </div>
@@ -79,24 +69,24 @@ const Calendar = ({ price, id }) => {
       <DatePicker
         id="checkInDate"
         selected={checkInDate}
-        onChange={handleCheckInDateChange}
-        placeholderText={'Check In'}
+        onChange={setCheckInDate}
+        placeholderText="yyyy-MM-dd (Check In)"
         dateFormat="yyyy-MM-dd"
         minDate={new Date()}
         excludeDates={timestamps}
         required
-        className="rounded-lg w-full"
+        className="rounded-lg w-full border border-gray-400 p-2"
       />
       <DatePicker
         id="checkOutDate"
         selected={checkOutDate}
-        onChange={handleCheckOutDateChange}
-        placeholderText={'Check out'}
+        onChange={setCheckOutDate}
+        placeholderText="yyyy-MM-dd (Check out)"
         dateFormat="yyyy-MM-dd"
         minDate={checkInDate}
         excludeDates={timestamps}
         required
-        className="rounded-lg w-full"
+        className="rounded-lg w-full border border-gray-400 p-2"
       />
       <button
         className="p-2 border-none bg-gradient-to-l from-pink-600
@@ -106,7 +96,7 @@ const Calendar = ({ price, id }) => {
         Book
       </button>
 
-      <Link href={`/room/bookings/${id}`} className="text-pink-500">
+      <Link href={`/room/bookings/${apartment.id}`} className="text-pink-500">
         Check your bookings
       </Link>
     </form>

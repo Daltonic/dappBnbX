@@ -46,6 +46,13 @@ const getBookings = async (id) => {
   return structuredBookings(bookings)
 }
 
+const getBookedDates = async (id) => {
+  const contract = await getEthereumContracts()
+  const bookings = await contract.getUnavailableDates(id)
+  const timestamps = bookings.map((timestamp) => Number(timestamp))
+  return timestamps
+}
+
 const createApartment = async (apartment) => {
   if (!ethereum) {
     reportError('Please install a browser provider')
@@ -97,6 +104,28 @@ const updateApartment = async (apartment) => {
   }
 }
 
+const bookApartment = async ({ aid, timestamps, amount }) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+
+    const securityFee = await contract.securityFee()
+    tx = await contract.bookApartment(aid, timestamps, {
+      value: toWei(amount + Number(securityFee)),
+    })
+
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const structureAppartments = (appartments) =>
   appartments.map((appartment) => ({
     id: Number(appartment.id),
@@ -123,4 +152,12 @@ const structuredBookings = (bookings) =>
     cancelled: booking.cancelled,
   }))
 
-export { getApartments, getApartment, getBookings, createApartment, updateApartment }
+export {
+  getApartments,
+  getApartment,
+  getBookings,
+  getBookedDates,
+  createApartment,
+  updateApartment,
+  bookApartment,
+}
