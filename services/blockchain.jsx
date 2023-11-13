@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import address from '@/contracts/contractAddress.json'
 import dappBnbAbi from '@/artifacts/contracts/DappBnb.sol/DappBnb.json'
+import { setGlobalState } from '@/store'
 
 const toWei = (num) => ethers.parseEther(num.toString())
 const fromWei = (num) => ethers.formatEther(num)
@@ -112,13 +113,17 @@ const bookApartment = async ({ aid, timestamps, amount }) => {
 
   try {
     const contract = await getEthereumContracts()
-
     const securityFee = await contract.securityFee()
+
     tx = await contract.bookApartment(aid, timestamps, {
       value: toWei(amount + Number(securityFee)),
     })
 
     await tx.wait()
+
+    // timestamps = await getBookedDates()
+    // setGlobalState('timestamps', timestamps)
+
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)

@@ -1,7 +1,8 @@
-import { formatDate } from '@/utils/helper'
 import Link from 'next/link'
-import { toast } from 'react-toastify'
 import { useAccount } from 'wagmi'
+import { toast } from 'react-toastify'
+import Identicon from 'react-identicons'
+import { formatDate, truncate } from '@/utils/helper'
 
 const Booking = ({ booking }) => {
   const { address } = useAccount()
@@ -70,55 +71,63 @@ const Booking = ({ booking }) => {
     handleRefund,
   }
 
-  if (booking.tenant == address) {
-    return <TenantView booking={booking} functions={functions} />
-  } else {
-    return <DefaultView booking={booking} />
-  }
+  return <TenantView booking={booking} functions={functions} owner={address} />
 }
 
-const TenantView = ({ booking, functions }) => {
+const TenantView = ({ booking, functions, owner }) => {
   return (
     <div className="w-full flex justify-between items-center my-3 bg-gray-100 p-3">
-      <Link className=" font-medium underline" href={'/room/' + booking.aid}>
-        {formatDate(booking.date)}
+      <Link
+        className="flex justify-start items-center
+      space-x-2 font-medium"
+        href={'/room/' + booking.aid}
+      >
+        <Identicon
+          string={booking.tenant}
+          size={30}
+          className="rounded-full shadow-gray-500 shadow-sm"
+        />
+        <div className="flex flex-col">
+          <span>{formatDate(booking.date)}</span>
+          <span className="text-gray-500 text-sm">{truncate(booking.tenant, 4, 4, 11)}</span>
+        </div>
       </Link>
-      {functions.bookedDayStatus(booking) ? (
+
+      {booking.tenant == owner && !booking.checked && (
+        <div className="flex space-x-2">
+          <button
+            className="p-2 bg-green-500 text-white rounded-full text-sm px-4"
+            onClick={functions.handleCheckIn}
+          >
+            Check In
+          </button>
+
+          <button
+            className="p-2 bg-red-500 text-white rounded-full text-sm px-4"
+            onClick={functions.handleRefund}
+          >
+            Refund
+          </button>
+        </div>
+      )}
+
+      {booking.tenant == owner && booking.checked && (
         <button
-          className="p-2 bg-green-500 text-white rounded-full text-sm px-4"
-          onClick={functions.handleCheckIn}
+          className="p-2 bg-yellow-500 text-white font-medium italic
+        rounded-full text-sm px-4"
         >
-          Check In
-        </button>
-      ) : booking.checked ? (
-        <button className="p-2 bg-yellow-500 text-white font-medium italic rounded-full text-sm px-4">
           Checked In
         </button>
-      ) : (
+      )}
+
+      {booking.tenant != owner && (
         <button
-          className="p-2 bg-[#ff385c] text-white rounded-full text-sm px-4"
-          onClick={functions.handleRefund}
+          className="p-2 bg-pink-500 text-white font-medium italic
+        rounded-full text-sm px-4"
         >
-          Refund
+          Booked
         </button>
       )}
-    </div>
-  )
-}
-
-const DefaultView = ({ booking }) => {
-  return (
-    <div className="w-full flex justify-between items-center my-3 bg-gray-100 p-3">
-      <Link className=" font-medium underline" href={'/room/' + booking.aid}>
-        {formatDate(booking.date)}
-      </Link>
-
-      <button
-        className="p-2 bg-pink-500 text-white font-medium
-      italic rounded-full text-sm px-4"
-      >
-        Booked
-      </button>
     </div>
   )
 }

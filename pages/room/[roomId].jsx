@@ -5,10 +5,13 @@ import { useGlobalState, setGlobalState } from '@/store'
 import { getApartment, getBookedDates } from '@/services/blockchain'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
 
-export default function Room({ apartment, timestamps, reviews }) {
+export default function Room({ apartment, timestampsData, reviews }) {
   const router = useRouter()
   const { roomId } = router.query
   const [booked] = useGlobalState('booked')
+  const [timestamps] = useGlobalState('timestamps')
+
+  setGlobalState('timestamps', timestampsData)
 
   const handleReviewOpen = () => {
     setGlobalState('reviewModal', 'scale-100')
@@ -63,12 +66,13 @@ export default function Room({ apartment, timestamps, reviews }) {
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
   const apartment = await getApartment(roomId)
-  const timestamps = await getBookedDates(roomId)
+  const timestampsData = await getBookedDates(roomId)
   const reviews = generateFakeReviews(5)
+  
   return {
     props: {
       apartment: JSON.parse(JSON.stringify(apartment)),
-      timestamps: JSON.parse(JSON.stringify(timestamps)),
+      timestampsData: JSON.parse(JSON.stringify(timestampsData)),
       reviews: JSON.parse(JSON.stringify(reviews)),
     },
   }

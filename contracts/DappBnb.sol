@@ -149,7 +149,11 @@ contract DappBnb is Ownable, ReentrancyGuard {
 
   function bookApartment(uint aid, uint[] memory dates) public payable {
     require(appartmentExist[aid], 'Apartment not found!');
-    require(msg.value >= apartments[aid].price * dates.length + securityFee, 'Insufficient fund!');
+    require(
+      msg.value >=
+        apartments[aid].price * dates.length + (apartments[aid].price * (securityFee / 100)),
+      'Insufficient fund!'
+    );
     require(datesAreCleared(aid, dates), 'Booked date found among dates!');
 
     for (uint i = 0; i < dates.length; i++) {

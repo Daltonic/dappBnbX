@@ -6,7 +6,7 @@ const { setGlobalState, useGlobalState, getGlobalState } = createGlobalState({
   reviews: [],
   authModal: "scale-0",
   reviewModal: "scale-0",
-  securityFee: null,
+  securityFee: 0,
   bookings: [],
   booking: null,
   booked: false,
