@@ -121,9 +121,48 @@ const bookApartment = async ({ aid, timestamps, amount }) => {
 
     await tx.wait()
 
-    // timestamps = await getBookedDates()
-    // setGlobalState('timestamps', timestamps)
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
 
+const checkInApartment = async (aid, timestamps) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.checkInApartment(aid, timestamps)
+
+    await tx.wait()
+    const bookings = await getBookings(aid)
+
+    setGlobalState('bookings', bookings)
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const refundBooking = async (aid, bookingId, timestamp) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.refundBooking(aid, bookingId, timestamp)
+
+    await tx.wait()
+    const bookings = await getBookings(aid)
+
+    setGlobalState('bookings', bookings)
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)
@@ -165,4 +204,6 @@ export {
   createApartment,
   updateApartment,
   bookApartment,
+  checkInApartment,
+  refundBooking,
 }

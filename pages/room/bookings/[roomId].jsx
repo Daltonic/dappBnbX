@@ -1,19 +1,19 @@
-import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { Booking } from '@/components'
 import { useRouter } from 'next/router'
 import { getBookings, getApartment } from '@/services/blockchain'
+import { useGlobalState, setGlobalState } from '@/store'
+import { useEffect } from 'react'
 
-const Bookings = ({ appartment, bookings }) => {
-  //   const [loaded, setLoaded] = useState(false)
+const Bookings = ({ appartment, bookingsData }) => {
   const { address } = useAccount()
   const router = useRouter()
   const { roomId } = router.query
+  const [bookings] = useGlobalState('bookings')
 
-  //   useEffect(async () => {
-  //     await getBookings(roomId).then(() => setLoaded(true))
-  //     await loadAppartment(roomId)
-  //   }, [])
+  useEffect(() => {
+    setGlobalState('bookings', bookingsData)
+  }, [bookings, bookingsData])
 
   const isDayAfter = (booking) => {
     const bookingDate = new Date(booking.date).getTime()
@@ -84,12 +84,12 @@ export default Bookings
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
   const appartment = await getApartment(roomId)
-  const bookings = await getBookings(roomId)
+  const bookingsData = await getBookings(roomId)
 
   return {
     props: {
       appartment: JSON.parse(JSON.stringify(appartment)),
-      bookings: JSON.parse(JSON.stringify(bookings)),
+      bookingsData: JSON.parse(JSON.stringify(bookingsData)),
     },
   }
 }

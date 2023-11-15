@@ -3,6 +3,7 @@ import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import Identicon from 'react-identicons'
 import { formatDate, truncate } from '@/utils/helper'
+import { checkInApartment, refundBooking } from '@/services/blockchain'
 
 const Booking = ({ booking }) => {
   const { address } = useAccount()
@@ -18,12 +19,12 @@ const Booking = ({ booking }) => {
   const handleCheckIn = async () => {
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await checkInApartment(booking.aid, booking.id)
-        //   .then(async () => {
-        //     await getBookings(booking.aid)
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await checkInApartment(booking.aid, booking.id)
+          .then(async (tx) => {
+            console.log(tx)
+            resolve(tx)
+          })
+          .catch((error) => reject(error))
       }),
       {
         pending: 'Approve transaction...',
@@ -34,25 +35,17 @@ const Booking = ({ booking }) => {
   }
 
   const handleRefund = async () => {
-    const params = {
-      id: booking.aid,
-      bookingId: booking.id,
-      date: new Date(booking.date).getTime(),
-    }
-
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await refund(params)
-        //   .then(async () => {
-        //     await getUnavailableDates(id)
-        //     await getBookings(id)
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await refundBooking(booking.aid, booking.id, booking.date)
+          .then(async () => {
+            resolve()
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
-        success: 'refund successful 👌',
+        success: 'Refunded successfully 👌',
         error: 'Encountered error 🤯',
       }
     )
@@ -93,7 +86,7 @@ const TenantView = ({ booking, functions, owner }) => {
         </div>
       </Link>
 
-      {booking.tenant == owner && !booking.checked && (
+      {booking.tenant == owner && !booking.checked && !booking.cancelled && (
         <div className="flex space-x-2">
           <button
             className="p-2 bg-green-500 text-white rounded-full text-sm px-4"
@@ -111,7 +104,7 @@ const TenantView = ({ booking, functions, owner }) => {
         </div>
       )}
 
-      {booking.tenant == owner && booking.checked && (
+      {booking.tenant == owner && booking.checked && !booking.cancelled && (
         <button
           className="p-2 bg-yellow-500 text-white font-medium italic
         rounded-full text-sm px-4"
@@ -120,12 +113,21 @@ const TenantView = ({ booking, functions, owner }) => {
         </button>
       )}
 
-      {booking.tenant != owner && (
+      {booking.tenant != owner && !booking.cancelled && (
         <button
-          className="p-2 bg-pink-500 text-white font-medium italic
+          className="p-2 bg-orange-500 text-white font-medium italic
         rounded-full text-sm px-4"
         >
           Booked
+        </button>
+      )}
+
+      {booking.cancelled && (
+        <button
+          className="p-2 bg-yellow-500 text-white font-medium italic
+        rounded-full text-sm px-4"
+        >
+          Cancelled
         </button>
       )}
     </div>

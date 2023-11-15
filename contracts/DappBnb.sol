@@ -208,6 +208,7 @@ contract DappBnb is Ownable, ReentrancyGuard {
 
   function refundBooking(uint aid, uint bookingId, uint date) public nonReentrant {
     require(!bookingsOf[aid][bookingId].checked, 'Apartment already checked on this date!');
+    require(isDateBooked[aid][date], 'Did not book on this date!');
 
     if (msg.sender != owner()) {
       require(msg.sender == bookingsOf[aid][bookingId].tenant, 'Unauthorized tenant!');
