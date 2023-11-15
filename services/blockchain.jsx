@@ -1,7 +1,8 @@
 import { ethers } from 'ethers'
+import { store } from '@/store'
+import { globalActions } from '@/store/globalSlices'
 import address from '@/contracts/contractAddress.json'
 import dappBnbAbi from '@/artifacts/contracts/DappBnb.sol/DappBnb.json'
-import { setGlobalState } from '@/store'
 
 const toWei = (num) => ethers.parseEther(num.toString())
 const fromWei = (num) => ethers.formatEther(num)
@@ -9,6 +10,7 @@ const fromWei = (num) => ethers.formatEther(num)
 let ethereum, tx
 
 if (typeof window !== 'undefined') ethereum = window.ethereum
+const { setBookings } = globalActions
 
 const getEthereumContracts = async () => {
   const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
@@ -141,7 +143,7 @@ const checkInApartment = async (aid, timestamps) => {
     await tx.wait()
     const bookings = await getBookings(aid)
 
-    setGlobalState('bookings', bookings)
+    store.dispatch(setBookings(bookings))
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)
@@ -162,7 +164,7 @@ const refundBooking = async (aid, bookingId, timestamp) => {
     await tx.wait()
     const bookings = await getBookings(aid)
 
-    setGlobalState('bookings', bookings)
+    store.dispatch(setBookings(bookings))
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)

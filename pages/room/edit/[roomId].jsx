@@ -4,17 +4,17 @@ import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { FaTimes } from 'react-icons/fa'
-import { getApartment, updateApartment } from '@/services/blockchain'
+import { getApartment, getBookedDates, updateApartment } from '@/services/blockchain'
 
-export default function Edit({ appartment }) {
+export default function Edit({ apartment }) {
   const { address } = useAccount()
-  const [name, setName] = useState(appartment.name)
-  const [description, setDescription] = useState(appartment.description)
-  const [location, setLocation] = useState(appartment.location)
-  const [rooms, setRooms] = useState(appartment.rooms)
+  const [name, setName] = useState(apartment.name)
+  const [description, setDescription] = useState(apartment.description)
+  const [location, setLocation] = useState(apartment.location)
+  const [rooms, setRooms] = useState(apartment.rooms)
   const [images, setImages] = useState('')
-  const [price, setPrice] = useState(appartment.price)
-  const [links, setLinks] = useState(appartment.images)
+  const [price, setPrice] = useState(apartment.price)
+  const [links, setLinks] = useState(apartment.images)
   const navigate = useRouter()
 
   const handleSubmit = async (e) => {
@@ -22,7 +22,7 @@ export default function Edit({ appartment }) {
     if (!name || !location || !description || !rooms || links.length != 5 || !price) return
 
     const params = {
-      ...appartment,
+      ...apartment,
       name,
       description,
       location,
@@ -35,7 +35,7 @@ export default function Edit({ appartment }) {
       new Promise(async (resolve, reject) => {
         await updateApartment(params)
           .then(async () => {
-            navigate.push('/room/' + appartment.id)
+            navigate.push('/room/' + apartment.id)
             resolve()
           })
           .catch(() => reject())
@@ -208,7 +208,7 @@ export default function Edit({ appartment }) {
             }`}
             disabled={!address}
           >
-            Update Appartment
+            Update Apartment
           </button>
         </form>
       </div>
@@ -218,10 +218,12 @@ export default function Edit({ appartment }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const appartment = await getApartment(roomId)
+  const apartment = await getApartment(roomId)
+  const booked = await getBookedDates(roomId)
   return {
     props: {
-      appartment: JSON.parse(JSON.stringify(appartment)),
+      apartment: JSON.parse(JSON.stringify(apartment)),
+      apartment: JSON.parse(JSON.stringify(apartment)),
     },
   }
 }

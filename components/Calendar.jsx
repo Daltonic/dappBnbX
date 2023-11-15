@@ -23,9 +23,9 @@ const Calendar = ({ apartment, timestamps }) => {
     }
 
     const params = {
-      aid: apartment.id,
+      aid: apartment?.id,
       timestamps: timestampArray,
-      amount: apartment.price * timestampArray.length,
+      amount: apartment?.price * timestampArray.length,
     }
 
     await toast.promise(
@@ -61,7 +61,7 @@ const Calendar = ({ apartment, timestamps }) => {
         <div className="flex justify-center items-center">
           <FaEthereum className="text-lg text-gray-500" />
           <span className="text-lg text-gray-500">
-            {apartment.price} <small>per night</small>
+            {apartment?.price} <small>per night</small>
           </span>
         </div>
       </div>
@@ -96,7 +96,7 @@ const Calendar = ({ apartment, timestamps }) => {
         Book
       </button>
 
-      <Link href={`/room/bookings/${apartment.id}`} className="text-pink-500">
+      <Link href={`/room/bookings/${apartment?.id}`} className="text-pink-500">
         Check your bookings
       </Link>
     </form>

@@ -1,26 +1,42 @@
 import Head from 'next/head'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { globalActions } from '@/store/globalSlices'
 import { generateFakeReviews } from '@/utils/fakeData'
-import { useGlobalState, setGlobalState } from '@/store'
+import { useDispatch, useSelector } from 'react-redux'
 import { getApartment, getBookedDates } from '@/services/blockchain'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
 
-export default function Room({ apartment, timestampsData, reviews }) {
+export default function Room({ apartmentData, timestampsData, reviewsData }) {
   const router = useRouter()
   const { roomId } = router.query
-  const [booked] = useGlobalState('booked')
-  const [timestamps] = useGlobalState('timestamps')
+  const dispatch = useDispatch()
 
-  setGlobalState('timestamps', timestampsData)
+  const { setApartment, setTimestamps, setReviewModal, setReviews } = globalActions
+  const { apartment, timestamps, booked, reviews } = useSelector((states) => states.globalStates)
+
+  useEffect(() => {
+    dispatch(setApartment(apartmentData))
+    dispatch(setTimestamps(timestampsData))
+    dispatch(setReviews(reviewsData))
+  }, [
+    dispatch,
+    setApartment,
+    apartmentData,
+    setTimestamps,
+    timestampsData,
+    setReviews,
+    reviewsData,
+  ])
 
   const handleReviewOpen = () => {
-    setGlobalState('reviewModal', 'scale-100')
+    dispatch(setReviewModal('scale-100'))
   }
 
   return (
     <>
       <Head>
-        <title>Room Page</title>
+        <title>Room | {apartment?.name}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -65,15 +81,15 @@ export default function Room({ apartment, timestampsData, reviews }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartment = await getApartment(roomId)
+  const apartmentData = await getApartment(roomId)
   const timestampsData = await getBookedDates(roomId)
-  const reviews = generateFakeReviews(5)
-  
+  const reviewsData = generateFakeReviews(5)
+
   return {
     props: {
-      apartment: JSON.parse(JSON.stringify(apartment)),
+      apartmentData: JSON.parse(JSON.stringify(apartmentData)),
       timestampsData: JSON.parse(JSON.stringify(timestampsData)),
-      reviews: JSON.parse(JSON.stringify(reviews)),
+      reviewsData: JSON.parse(JSON.stringify(reviewsData)),
     },
   }
 }
