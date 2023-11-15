@@ -3,7 +3,7 @@ import { Booking } from '@/components'
 import { useRouter } from 'next/router'
 import { globalActions } from '@/store/globalSlices'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBookings, getApartment } from '@/services/blockchain'
+import { generateFakeApartment, generateFakeBookings } from '@/utils/fakeData'
 
 const Bookings = ({ apartmentData, bookingsData }) => {
   const router = useRouter()
@@ -18,37 +18,6 @@ const Bookings = ({ apartmentData, bookingsData }) => {
     dispatch(setApartment(apartmentData))
     dispatch(setBookings(bookingsData))
   }, [dispatch, setApartment, apartmentData, setBookings, bookingsData])
-
-  const isDayAfter = (booking) => {
-    const bookingDate = new Date(booking.date).getTime()
-    const today = new Date().getTime()
-    const oneDay = 24 * 60 * 60 * 1000
-    return today > bookingDate + oneDay && !booking.checked
-  }
-
-  const handleClaimFunds = async (booking) => {
-    const params = {
-      id: roomId,
-      bookingId: booking.id,
-    }
-
-    await toast.promise(
-      new Promise(async (resolve, reject) => {
-        // await claimFunds(params)
-        //   .then(async () => {
-        //     await getUnavailableDates(roomId)
-        //     await getBookings(roomId)
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
-      }),
-      {
-        pending: 'Approve transaction...',
-        success: 'funds claimed successfully 👌',
-        error: 'Encountered error 🤯',
-      }
-    )
-  }
 
   return (
     <div className="w-full sm:w-3/5 mx-auto mt-8">
@@ -66,8 +35,8 @@ export default Bookings
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartmentData = await getApartment(roomId)
-  const bookingsData = await getBookings(roomId)
+  const apartmentData = generateFakeApartment(roomId)[0]
+  const bookingsData = generateFakeBookings(5)
 
   return {
     props: {

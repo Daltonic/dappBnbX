@@ -1,17 +1,11 @@
 import Head from 'next/head'
 import { useEffect } from 'react'
+import { useAccount } from 'wagmi'
 import { useRouter } from 'next/router'
 import { globalActions } from '@/store/globalSlices'
 import { useDispatch, useSelector } from 'react-redux'
+import { generateFakeApartment, generateFakeReviews } from '@/utils/fakeData'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
-import {
-  getReviews,
-  getApartment,
-  getBookedDates,
-  getSecurityFee,
-  getQualifiedReviewers,
-} from '@/services/blockchain'
-import { useAccount } from 'wagmi'
 
 export default function Room({
   apartmentData,
@@ -98,11 +92,11 @@ export default function Room({
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartmentData = await getApartment(roomId)
-  const timestampsData = await getBookedDates(roomId)
-  const qualifiedReviewers = await getQualifiedReviewers(roomId)
-  const reviewsData = await getReviews(roomId)
-  const securityFee = await getSecurityFee()
+  const apartmentData = generateFakeApartment(roomId)[0]
+  const timestampsData = []
+  const qualifiedReviewers = []
+  const reviewsData = generateFakeReviews(4)
+  const securityFee = 5
 
   return {
     props: {

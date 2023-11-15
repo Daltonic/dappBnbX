@@ -5,7 +5,6 @@ import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import { FaEthereum } from 'react-icons/fa'
-import { bookApartment } from '@/services/blockchain'
 
 const Calendar = ({ apartment, timestamps }) => {
   const [checkInDate, setCheckInDate] = useState(null)
@@ -34,12 +33,12 @@ const Calendar = ({ apartment, timestamps }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        await bookApartment(params)
-          .then(async () => {
-            resetForm()
-            resolve()
-          })
-          .catch(() => reject())
+        // await bookApartment(params)
+        //   .then(async () => {
+        //     resetForm()
+        //     resolve()
+        //   })
+        //   .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',

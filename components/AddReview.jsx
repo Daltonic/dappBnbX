@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { FaTimes } from 'react-icons/fa'
-import { addReview } from '@/services/blockchain'
 import { globalActions } from '@/store/globalSlices'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -23,13 +22,13 @@ const AddReview = ({ roomId }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        await addReview(roomId, reviewText)
-          .then(async (tx) => {
-            dispatch(setReviewModal('scale-0'))
-            resetForm()
-            resolve(tx)
-          })
-          .catch(() => reject())
+        // await addReview(roomId, reviewText)
+        //   .then(async (tx) => {
+        //     dispatch(setReviewModal('scale-0'))
+        //     resetForm()
+        //     resolve(tx)
+        //   })
+        //   .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',

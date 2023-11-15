@@ -4,7 +4,6 @@ import { truncate } from '@/store'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
-import { createApartment } from '@/services/blockchain'
 
 export default function Add() {
   const { address } = useAccount()
@@ -32,12 +31,12 @@ export default function Add() {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        await createApartment(params)
-          .then(async () => {
-            navigate.push('/')
-            resolve()
-          })
-          .catch(() => reject())
+        // await createApartment(params)
+        //   .then(async () => {
+        //     navigate.push('/')
+        //     resolve()
+        //   })
+        //   .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',

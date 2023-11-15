@@ -38,6 +38,7 @@ export const generateFakeApartment = (count) => {
     const name = faker.word.words(5)
     const deleted = faker.datatype.boolean()
     const description = faker.lorem.paragraph()
+    const location = faker.lorem.word()
     const price = faker.number.float({
       min: 0.1,
       max: 3.5,
@@ -59,6 +60,7 @@ export const generateFakeApartment = (count) => {
       id,
       name,
       description,
+      location,
       price,
       images,
       rooms,

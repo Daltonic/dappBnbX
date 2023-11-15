@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { truncate } from '@/store'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { FaTimes } from 'react-icons/fa'
-import { getApartment, getBookedDates, updateApartment } from '@/services/blockchain'
+import { truncate } from '@/utils/helper'
+import { generateFakeApartment } from '@/utils/fakeData'
 
 export default function Edit({ apartment }) {
   const { address } = useAccount()
@@ -33,12 +33,12 @@ export default function Edit({ apartment }) {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        await updateApartment(params)
-          .then(async () => {
-            navigate.push('/room/' + apartment.id)
-            resolve()
-          })
-          .catch(() => reject())
+        // await updateApartment(params)
+        //   .then(async () => {
+        //     navigate.push('/room/' + apartment.id)
+        //     resolve()
+        //   })
+        //   .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
@@ -218,11 +218,9 @@ export default function Edit({ apartment }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartment = await getApartment(roomId)
-  const booked = await getBookedDates(roomId)
+  const apartment = generateFakeApartment(roomId)[0]
   return {
     props: {
-      apartment: JSON.parse(JSON.stringify(apartment)),
       apartment: JSON.parse(JSON.stringify(apartment)),
     },
   }
