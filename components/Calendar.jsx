@@ -2,14 +2,13 @@ import moment from 'moment'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import { FaEthereum } from 'react-icons/fa'
 
 const Calendar = ({ apartment, timestamps }) => {
   const [checkInDate, setCheckInDate] = useState(null)
   const [checkOutDate, setCheckOutDate] = useState(null)
-  const { securityFee } = useSelector((states) => states.globalStates)
+  const securityFee = 5
 
   const handleSubmit = async (e) => {
     e.preventDefault()

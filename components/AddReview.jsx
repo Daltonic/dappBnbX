@@ -1,15 +1,12 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { FaTimes } from 'react-icons/fa'
-import { globalActions } from '@/store/globalSlices'
-import { useDispatch, useSelector } from 'react-redux'
 
 const AddReview = ({ roomId }) => {
   const [reviewText, setReviewText] = useState('')
-  const dispatch = useDispatch()
+  const reviewModal = 'scale-0'
 
-  const { setReviewModal } = globalActions
-  const { reviewModal } = useSelector((states) => states.globalStates)
+  const closeModal = () => {}
 
   const resetForm = () => {
     setReviewText('')
@@ -50,7 +47,7 @@ const AddReview = ({ roomId }) => {
             <button
               type="button"
               className="border-0 bg-transparent focus:outline-none"
-              onClick={() => dispatch(setReviewModal('scale-0'))}
+              onClick={closeModal}
             >
               <FaTimes className="text-gray-400" />
             </button>
