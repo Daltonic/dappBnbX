@@ -10,7 +10,7 @@ const fromWei = (num) => ethers.formatEther(num)
 let ethereum, tx
 
 if (typeof window !== 'undefined') ethereum = window.ethereum
-const { setBookings, setTimestamps } = globalActions
+const { setBookings, setTimestamps, setReviews } = globalActions
 
 const getEthereumContracts = async () => {
   const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
@@ -47,6 +47,18 @@ const getBookings = async (id) => {
   const contract = await getEthereumContracts()
   const bookings = await contract.getBookings(id)
   return structuredBookings(bookings)
+}
+
+const getQualifiedReviewers = async (id) => {
+  const contract = await getEthereumContracts()
+  const bookings = await contract.getQualifiedReviewers(id)
+  return bookings
+}
+
+const getReviews = async (id) => {
+  const contract = await getEthereumContracts()
+  const reviewers = await contract.getReviews(id)
+  return structuredReviews(reviewers)
 }
 
 const getBookedDates = async (id) => {
@@ -178,6 +190,27 @@ const refundBooking = async (aid, bookingId, timestamp) => {
   }
 }
 
+const addReview = async (aid, comment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.addReview(aid, comment)
+
+    await tx.wait()
+    const reviews = await getReviews(aid)
+
+    store.dispatch(setReviews(reviews))
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const structureAppartments = (appartments) =>
   appartments.map((appartment) => ({
     id: Number(appartment.id),
@@ -204,6 +237,15 @@ const structuredBookings = (bookings) =>
     cancelled: booking.cancelled,
   }))
 
+const structuredReviews = (reviews) =>
+  reviews.map((review) => ({
+    id: Number(review.id),
+    aid: Number(review.aid),
+    text: review.reviewText,
+    owner: review.owner,
+    timestamp: Number(review.timestamp),
+  }))
+
 export {
   getApartments,
   getApartment,
@@ -214,5 +256,8 @@ export {
   bookApartment,
   checkInApartment,
   refundBooking,
+  addReview,
+  getReviews,
+  getQualifiedReviewers,
   getSecurityFee,
 }

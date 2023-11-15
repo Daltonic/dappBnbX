@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { FaTimes } from 'react-icons/fa'
 import { toast } from 'react-toastify'
+import { FaTimes } from 'react-icons/fa'
+import { addReview } from '@/services/blockchain'
 import { globalActions } from '@/store/globalSlices'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 const AddReview = ({ roomId }) => {
   const [reviewText, setReviewText] = useState('')
+  const dispatch = useDispatch()
 
   const { setReviewModal } = globalActions
   const { reviewModal } = useSelector((states) => states.globalStates)
@@ -21,18 +23,17 @@ const AddReview = ({ roomId }) => {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await addReview(roomId, reviewText)
-        //   .then(async () => {
-        //     setGlobalState('reviewModal', 'scale-0')
-        //     resetForm()
-        //     await loadReviews(roomId)
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        await addReview(roomId, reviewText)
+          .then(async (tx) => {
+            dispatch(setReviewModal('scale-0'))
+            resetForm()
+            resolve(tx)
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
-        success: 'Review posted successfully 👌',
+        success: 'Review submitted successfully 👌',
         error: 'Encountered error 🤯',
       }
     )
@@ -63,14 +64,16 @@ const AddReview = ({ roomId }) => {
             >
               <p className="text-lg font-bold text-slate-700"> DappBnB</p>
             </div>
-            <p className="p-2">Add your review below</p>
           </div>
 
-          <div className="flex flex-row justify-between items-center
-          bg-gray-300 rounded-xl mt-5 p-2">
+          <div
+            className="flex flex-row justify-between items-center
+          border border-gray-300 p-2 rounded-xl mt-5"
+          >
             <textarea
-              className="block w-full text-sm resize-none text-slate-500 
-              bg-transparent border-0 focus:outline-none focus:ring-0 h-20"
+              className="block w-full text-sm resize-none
+                text-slate-500 bg-transparent border-0
+                focus:outline-none focus:ring-0 h-14"
               type="text"
               name="comment"
               placeholder="Drop your review..."

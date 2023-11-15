@@ -2,24 +2,37 @@ import Head from 'next/head'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { globalActions } from '@/store/globalSlices'
-import { generateFakeReviews } from '@/utils/fakeData'
 import { useDispatch, useSelector } from 'react-redux'
-import { getApartment, getBookedDates, getSecurityFee } from '@/services/blockchain'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
+import {
+  getReviews,
+  getApartment,
+  getBookedDates,
+  getSecurityFee,
+  getQualifiedReviewers,
+} from '@/services/blockchain'
+import { useAccount } from 'wagmi'
 
-export default function Room({ apartmentData, timestampsData, reviewsData, securityFee }) {
+export default function Room({
+  apartmentData,
+  timestampsData,
+  reviewsData,
+  securityFee,
+  qualifiedReviewers,
+}) {
   const router = useRouter()
   const { roomId } = router.query
   const dispatch = useDispatch()
+  const { address } = useAccount()
 
   const { setApartment, setTimestamps, setReviewModal, setReviews, setSecurityFee } = globalActions
-  const { apartment, timestamps, booked, reviews } = useSelector((states) => states.globalStates)
-  dispatch(setSecurityFee(securityFee))
+  const { apartment, timestamps, reviews } = useSelector((states) => states.globalStates)
 
   useEffect(() => {
     dispatch(setApartment(apartmentData))
     dispatch(setTimestamps(timestampsData))
     dispatch(setReviews(reviewsData))
+    dispatch(setSecurityFee(securityFee))
   }, [
     dispatch,
     setApartment,
@@ -28,6 +41,8 @@ export default function Room({ apartmentData, timestampsData, reviewsData, secur
     timestampsData,
     setReviews,
     reviewsData,
+    setSecurityFee,
+    securityFee,
   ])
 
   const handleReviewOpen = () => {
@@ -57,7 +72,17 @@ export default function Room({ apartmentData, timestampsData, reviewsData, secur
         <Actions id={apartment?.id} owner={apartment?.owner} />
 
         <div className="flex flex-col justify-between flex-wrap space-y-2">
-          <h1 className="text-xl font-semibold">Reviews</h1>
+          <div className="flex justify-start items-center space-x-2">
+            <h1 className="text-xl font-semibold">Reviews</h1>
+            {qualifiedReviewers?.includes(address) && (
+              <button
+                className="cursor-pointer text-pink-500 hover:text-pink-700"
+                onClick={handleReviewOpen}
+              >
+                Drop your review
+              </button>
+            )}
+          </div>
           <div>
             {reviews.map((review, i) => (
               <Review key={i} review={review} />
@@ -65,15 +90,6 @@ export default function Room({ apartmentData, timestampsData, reviewsData, secur
             {reviews.length < 1 && 'No reviews yet!'}
           </div>
         </div>
-
-        {booked && (
-          <button
-            className="underline mt-11 cursor-pointer hover:text-blue-700"
-            onClick={handleReviewOpen}
-          >
-            Drop your review
-          </button>
-        )}
       </div>
       <AddReview roomId={roomId} />
     </>
@@ -84,7 +100,8 @@ export const getServerSideProps = async (context) => {
   const { roomId } = context.query
   const apartmentData = await getApartment(roomId)
   const timestampsData = await getBookedDates(roomId)
-  const reviewsData = generateFakeReviews(5)
+  const qualifiedReviewers = await getQualifiedReviewers(roomId)
+  const reviewsData = await getReviews(roomId)
   const securityFee = await getSecurityFee()
 
   return {
@@ -92,6 +109,7 @@ export const getServerSideProps = async (context) => {
       apartmentData: JSON.parse(JSON.stringify(apartmentData)),
       timestampsData: JSON.parse(JSON.stringify(timestampsData)),
       reviewsData: JSON.parse(JSON.stringify(reviewsData)),
+      qualifiedReviewers: JSON.parse(JSON.stringify(qualifiedReviewers)),
       securityFee: JSON.parse(JSON.stringify(securityFee)),
     },
   }
