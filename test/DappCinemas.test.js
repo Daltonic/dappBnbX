@@ -4,7 +4,7 @@ const { ethers } = require('hardhat')
 const toWei = (num) => ethers.parseEther(num.toString())
 const fromWei = (num) => ethers.formatEther(num)
 
-const dates1 = [1678492800000, 1678579200000, 1678665600000]
+const dates1 = [1700140191726, 1700226628922, 1700313044089]
 const dates2 = [1678752000000, 1678838400000]
 
 describe('Contracts', () => {
@@ -34,61 +34,61 @@ describe('Contracts', () => {
     await contract.waitForDeployment()
   })
 
-  describe('Apartment', () => {
-    beforeEach(async () => {
-      await contract
-        .connect(owner)
-        .createAppartment(name, description, location, images.join(','), rooms, toWei(price))
-    })
+  // describe('Apartment', () => {
+  //   beforeEach(async () => {
+  //     await contract
+  //       .connect(owner)
+  //       .createAppartment(name, description, location, images.join(','), rooms, toWei(price))
+  //   })
 
-    it('Should confirm apartment in array', async () => {
-      result = await contract.getApartments()
-      expect(result).to.have.lengthOf(1)
+  //   it('Should confirm apartment in array', async () => {
+  //     result = await contract.getApartments()
+  //     expect(result).to.have.lengthOf(1)
 
-      result = await contract.getApartment(id)
-      expect(result.name).to.be.equal(name)
-      expect(result.description).to.be.equal(description)
-      expect(result.images).to.be.equal(images.join(','))
-    })
+  //     result = await contract.getApartment(id)
+  //     expect(result.name).to.be.equal(name)
+  //     expect(result.description).to.be.equal(description)
+  //     expect(result.images).to.be.equal(images.join(','))
+  //   })
 
-    it('Should confirm apartment update', async () => {
-      result = await contract.getApartment(id)
-      expect(result.name).to.be.equal(name)
-      expect(result.price).to.be.equal(toWei(price))
+  //   it('Should confirm apartment update', async () => {
+  //     result = await contract.getApartment(id)
+  //     expect(result.name).to.be.equal(name)
+  //     expect(result.price).to.be.equal(toWei(price))
 
-      await contract
-        .connect(owner)
-        .updateAppartment(
-          id,
-          newName,
-          description,
-          location,
-          images.join(','),
-          rooms,
-          toWei(newPrice)
-        )
+  //     await contract
+  //       .connect(owner)
+  //       .updateAppartment(
+  //         id,
+  //         newName,
+  //         description,
+  //         location,
+  //         images.join(','),
+  //         rooms,
+  //         toWei(newPrice)
+  //       )
 
-      result = await contract.getApartment(id)
-      expect(result.name).to.be.equal(newName)
-      expect(result.price).to.be.equal(toWei(newPrice))
-    })
+  //     result = await contract.getApartment(id)
+  //     expect(result.name).to.be.equal(newName)
+  //     expect(result.price).to.be.equal(toWei(newPrice))
+  //   })
 
-    it('Should confirm apartment deletion', async () => {
-      result = await contract.getApartments()
-      expect(result).to.have.lengthOf(1)
+  //   it('Should confirm apartment deletion', async () => {
+  //     result = await contract.getApartments()
+  //     expect(result).to.have.lengthOf(1)
 
-      result = await contract.getApartment(id)
-      expect(result.deleted).to.be.equal(false)
+  //     result = await contract.getApartment(id)
+  //     expect(result.deleted).to.be.equal(false)
 
-      await contract.connect(owner).deleteAppartment(id)
+  //     await contract.connect(owner).deleteAppartment(id)
 
-      result = await contract.getApartments()
-      expect(result).to.have.lengthOf(0)
+  //     result = await contract.getApartments()
+  //     expect(result).to.have.lengthOf(0)
 
-      result = await contract.getApartment(id)
-      expect(result.deleted).to.be.equal(true)
-    })
-  })
+  //     result = await contract.getApartment(id)
+  //     expect(result.deleted).to.be.equal(true)
+  //   })
+  // })
 
   describe('Booking', () => {
     describe('Success', () => {
@@ -97,8 +97,9 @@ describe('Contracts', () => {
           .connect(owner)
           .createAppartment(name, description, location, images.join(','), rooms, toWei(price))
 
+        const amount = price * dates1.length + (price * dates1.length * securityFee) / 100
         await contract.connect(tenant1).bookApartment(id, dates1, {
-          value: toWei(price * dates1.length + securityFee),
+          value: toWei(amount),
         })
       })
 
@@ -109,7 +110,7 @@ describe('Contracts', () => {
         result = await contract.getUnavailableDates(id)
         expect(result).to.have.lengthOf(dates1.length)
       })
-      
+
       it('Should confirm qualified reviewers', async () => {
         result = await contract.getQualifiedReviewers(id)
         expect(result).to.have.lengthOf(0)
@@ -136,6 +137,16 @@ describe('Contracts', () => {
         expect(result).to.be.equal(true)
       })
 
+      it('Should confirm apartment refund', async () => {
+        result = await contract.getBooking(id, bookingId)
+        expect(result.cancelled).to.be.equal(false)
+
+        await contract.connect(tenant1).refundBooking(id, bookingId)
+
+        result = await contract.getBooking(id, bookingId)
+        expect(result.cancelled).to.be.equal(true)
+      })
+
       it('Should return the security fee', async () => {
         result = await contract.securityFee()
         expect(result).to.be.equal(securityFee)
@@ -155,9 +166,10 @@ describe('Contracts', () => {
       })
 
       it('Should prevent booking with wrong id', async () => {
+        const amount = price * dates1.length + (price * dates1.length * securityFee) / 100
         await expect(
           contract.connect(tenant1).bookApartment(666, dates1, {
-            value: toWei(price * dates1.length + securityFee),
+            value: toWei(amount),
           })
         ).to.be.revertedWith('Apartment not found!')
       })

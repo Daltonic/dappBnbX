@@ -4,10 +4,10 @@ const fs = require('fs')
 async function deployContract() {
   let contract
   const taxPercent = 7
-  const securityFee = 5
+  const securityFeePercent = 5
 
   try {
-    contract = await ethers.deployContract('DappBnb', [taxPercent, securityFee])
+    contract = await ethers.deployContract('DappBnb', [taxPercent, securityFeePercent])
     await contract.waitForDeployment()
 
     console.log('Contracts deployed successfully.')

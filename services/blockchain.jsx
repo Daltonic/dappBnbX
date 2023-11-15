@@ -125,6 +125,24 @@ const updateApartment = async (apartment) => {
   }
 }
 
+const deleteApartment = async (aid) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.deleteAppartment(aid)
+    await tx.wait()
+
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const bookApartment = async ({ aid, timestamps, amount }) => {
   if (!ethereum) {
     reportError('Please install a browser provider')
@@ -169,7 +187,7 @@ const checkInApartment = async (aid, timestamps) => {
   }
 }
 
-const refundBooking = async (aid, bookingId, timestamp) => {
+const refundBooking = async (aid, bookingId) => {
   if (!ethereum) {
     reportError('Please install a browser provider')
     return Promise.reject(new Error('Browser provider not installed'))
@@ -177,7 +195,7 @@ const refundBooking = async (aid, bookingId, timestamp) => {
 
   try {
     const contract = await getEthereumContracts()
-    tx = await contract.refundBooking(aid, bookingId, timestamp)
+    tx = await contract.refundBooking(aid, bookingId)
 
     await tx.wait()
     const bookings = await getBookings(aid)
@@ -253,6 +271,7 @@ export {
   getBookedDates,
   createApartment,
   updateApartment,
+  deleteApartment,
   bookApartment,
   checkInApartment,
   refundBooking,

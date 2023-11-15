@@ -41,8 +41,6 @@ contract DappBnb is Ownable, ReentrancyGuard {
     address owner;
   }
 
-  event SecurityFeeUpdated(uint newFee);
-
   uint public securityFee;
   uint public taxPercent;
 
@@ -151,7 +149,8 @@ contract DappBnb is Ownable, ReentrancyGuard {
     require(appartmentExist[aid], 'Apartment not found!');
     require(
       msg.value >=
-        apartments[aid].price * dates.length + (apartments[aid].price * (securityFee / 100)),
+        (apartments[aid].price * dates.length) +
+          (((apartments[aid].price * dates.length) * securityFee) / 100),
       'Insufficient fund!'
     );
     require(datesAreCleared(aid, dates), 'Booked date found among dates!');
@@ -180,18 +179,19 @@ contract DappBnb is Ownable, ReentrancyGuard {
   }
 
   function checkInApartment(uint aid, uint bookingId) public {
-    require(msg.sender == bookingsOf[aid][bookingId].tenant, 'Unauthorized tenant!');
-    require(!bookingsOf[aid][bookingId].checked, 'Apartment already checked on this date!');
+    BookingStruct memory booking = bookingsOf[aid][bookingId];
+    require(msg.sender == booking.tenant, 'Unauthorized tenant!');
+    require(!booking.checked, 'Apartment already checked on this date!');
 
     bookingsOf[aid][bookingId].checked = true;
-    uint price = bookingsOf[aid][bookingId].price;
-    uint fee = (price * taxPercent) / 100;
+    uint tax = (booking.price * taxPercent) / 100;
+    uint fee = (booking.price * securityFee) / 100;
 
     hasBooked[msg.sender][aid] = true;
 
-    payTo(apartments[aid].owner, (price - fee));
-    payTo(owner(), fee);
-    payTo(msg.sender, securityFee);
+    payTo(apartments[aid].owner, (booking.price - tax));
+    payTo(owner(), tax);
+    payTo(msg.sender, fee);
   }
 
   function claimFunds(uint aid, uint bookingId) public {
@@ -206,36 +206,30 @@ contract DappBnb is Ownable, ReentrancyGuard {
     payTo(msg.sender, securityFee);
   }
 
-  function refundBooking(uint aid, uint bookingId, uint date) public nonReentrant {
-    require(!bookingsOf[aid][bookingId].checked, 'Apartment already checked on this date!');
-    require(isDateBooked[aid][date], 'Did not book on this date!');
+  function refundBooking(uint aid, uint bookingId) public nonReentrant {
+    BookingStruct memory booking = bookingsOf[aid][bookingId];
+    require(!booking.checked, 'Apartment already checked on this date!');
+    require(isDateBooked[aid][booking.date], 'Did not book on this date!');
 
     if (msg.sender != owner()) {
-      require(msg.sender == bookingsOf[aid][bookingId].tenant, 'Unauthorized tenant!');
-      require(
-        bookingsOf[aid][bookingId].date > currentTime(),
-        'Can no longer refund, booking date started'
-      );
+      require(msg.sender == booking.tenant, 'Unauthorized tenant!');
+      require(booking.date > currentTime(), 'Can no longer refund, booking date started');
     }
 
     bookingsOf[aid][bookingId].cancelled = true;
-    isDateBooked[aid][date] = false;
+    isDateBooked[aid][booking.date] = false;
 
     uint lastIndex = bookedDates[aid].length - 1;
     uint lastBookingId = bookedDates[aid][lastIndex];
     bookedDates[aid][bookingId] = lastBookingId;
     bookedDates[aid].pop();
 
-    uint price = bookingsOf[aid][bookingId].price;
-    uint fee = (securityFee * taxPercent) / 100;
+    uint fee = (booking.price * securityFee) / 100;
+    uint collateral = fee / 2;
 
-    payTo(apartments[aid].owner, (securityFee - fee));
-    payTo(owner(), fee);
-    payTo(msg.sender, price);
-  }
-
-  function hasBookedDateReached(uint aid, uint bookingId) public view returns (bool) {
-    return bookingsOf[aid][bookingId].date < currentTime();
+    payTo(apartments[aid].owner, collateral);
+    payTo(owner(), collateral);
+    payTo(msg.sender, booking.price);
   }
 
   function getUnavailableDates(uint aid) public view returns (uint[] memory) {
@@ -266,16 +260,6 @@ contract DappBnb is Ownable, ReentrancyGuard {
     return bookingsOf[aid][bookingId];
   }
 
-  function updateSecurityFee(uint newFee) public onlyOwner {
-    require(newFee > 0);
-    securityFee = newFee;
-    emit SecurityFeeUpdated(newFee);
-  }
-
-  function updateTaxPercent(uint newTaxPercent) public onlyOwner {
-    taxPercent = newTaxPercent;
-  }
-
   function payTo(address to, uint256 amount) internal {
     (bool success, ) = payable(to).call{ value: amount }('');
     require(success);
@@ -301,8 +285,8 @@ contract DappBnb is Ownable, ReentrancyGuard {
     return reviewsOf[aid];
   }
 
-  function tenantBooked(uint aid) public view returns (bool) {
-    return hasBooked[msg.sender][aid];
+  function tenantBooked(uint appartmentId) public view returns (bool) {
+    return hasBooked[msg.sender][appartmentId];
   }
 
   function currentTime() internal view returns (uint256) {

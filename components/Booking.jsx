@@ -37,7 +37,7 @@ const Booking = ({ booking }) => {
   const handleRefund = async () => {
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        await refundBooking(booking.aid, booking.id, booking.date)
+        await refundBooking(booking.aid, booking.id)
           .then(async () => {
             resolve()
           })

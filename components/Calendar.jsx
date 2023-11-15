@@ -27,7 +27,9 @@ const Calendar = ({ apartment, timestamps }) => {
     const params = {
       aid: apartment?.id,
       timestamps: timestampArray,
-      amount: apartment?.price * timestampArray.length + securityFee,
+      amount:
+        apartment?.price * timestampArray.length +
+        (apartment?.price * timestampArray.length * securityFee) / 100,
     }
 
     await toast.promise(
@@ -72,7 +74,7 @@ const Calendar = ({ apartment, timestamps }) => {
         id="checkInDate"
         selected={checkInDate}
         onChange={setCheckInDate}
-        placeholderText="yyyy-MM-dd (Check In)"
+        placeholderText="YYYY-MM-DD (Check In)"
         dateFormat="yyyy-MM-dd"
         minDate={new Date()}
         excludeDates={timestamps}
@@ -83,7 +85,7 @@ const Calendar = ({ apartment, timestamps }) => {
         id="checkOutDate"
         selected={checkOutDate}
         onChange={setCheckOutDate}
-        placeholderText="yyyy-MM-dd (Check out)"
+        placeholderText="YYYY-MM-DD (Check out)"
         dateFormat="yyyy-MM-dd"
         minDate={checkInDate}
         excludeDates={timestamps}

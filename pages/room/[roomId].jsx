@@ -57,7 +57,7 @@ export default function Room({
       </Head>
 
       <div className="py-8 px-10 sm:px-20 md:px-32 space-y-8">
-        <Title name={apartment?.name} rooms={apartment?.rooms} />
+        <Title apartment={apartment} />
 
         <ImageGrid
           first={apartment?.images[0]}
@@ -67,9 +67,9 @@ export default function Room({
           fifth={apartment?.images[4]}
         />
 
-        <Description description={apartment?.description} location={apartment?.location} />
+        <Description apartment={apartment} />
         <Calendar apartment={apartment} timestamps={timestamps} />
-        <Actions id={apartment?.id} owner={apartment?.owner} />
+        <Actions apartment={apartment} />
 
         <div className="flex flex-col justify-between flex-wrap space-y-2">
           <div className="flex justify-start items-center space-x-2">
