@@ -1,14 +1,16 @@
+import moment from 'moment'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import { FaEthereum } from 'react-icons/fa'
 import { bookApartment } from '@/services/blockchain'
-import moment from 'moment'
 
 const Calendar = ({ apartment, timestamps }) => {
   const [checkInDate, setCheckInDate] = useState(null)
   const [checkOutDate, setCheckOutDate] = useState(null)
+  const { securityFee } = useSelector((states) => states.globalStates)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -25,7 +27,7 @@ const Calendar = ({ apartment, timestamps }) => {
     const params = {
       aid: apartment?.id,
       timestamps: timestampArray,
-      amount: apartment?.price * timestampArray.length,
+      amount: apartment?.price * timestampArray.length + securityFee,
     }
 
     await toast.promise(

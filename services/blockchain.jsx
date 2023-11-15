@@ -10,7 +10,7 @@ const fromWei = (num) => ethers.formatEther(num)
 let ethereum, tx
 
 if (typeof window !== 'undefined') ethereum = window.ethereum
-const { setBookings } = globalActions
+const { setBookings, setTimestamps } = globalActions
 
 const getEthereumContracts = async () => {
   const accounts = await ethereum?.request?.({ method: 'eth_accounts' })
@@ -54,6 +54,12 @@ const getBookedDates = async (id) => {
   const bookings = await contract.getUnavailableDates(id)
   const timestamps = bookings.map((timestamp) => Number(timestamp))
   return timestamps
+}
+
+const getSecurityFee = async () => {
+  const contract = await getEthereumContracts()
+  const fee = await contract.securityFee()
+  return Number(fee)
 }
 
 const createApartment = async (apartment) => {
@@ -115,14 +121,14 @@ const bookApartment = async ({ aid, timestamps, amount }) => {
 
   try {
     const contract = await getEthereumContracts()
-    const securityFee = await contract.securityFee()
-
     tx = await contract.bookApartment(aid, timestamps, {
-      value: toWei(amount + Number(securityFee)),
+      value: toWei(amount),
     })
 
     await tx.wait()
+    const bookedDates = await getBookedDates(aid)
 
+    store.dispatch(setTimestamps(bookedDates))
     return Promise.resolve(tx)
   } catch (error) {
     reportError(error)
@@ -208,4 +214,5 @@ export {
   bookApartment,
   checkInApartment,
   refundBooking,
+  getSecurityFee,
 }

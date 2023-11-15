@@ -4,16 +4,17 @@ import { useRouter } from 'next/router'
 import { globalActions } from '@/store/globalSlices'
 import { generateFakeReviews } from '@/utils/fakeData'
 import { useDispatch, useSelector } from 'react-redux'
-import { getApartment, getBookedDates } from '@/services/blockchain'
+import { getApartment, getBookedDates, getSecurityFee } from '@/services/blockchain'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
 
-export default function Room({ apartmentData, timestampsData, reviewsData }) {
+export default function Room({ apartmentData, timestampsData, reviewsData, securityFee }) {
   const router = useRouter()
   const { roomId } = router.query
   const dispatch = useDispatch()
 
-  const { setApartment, setTimestamps, setReviewModal, setReviews } = globalActions
+  const { setApartment, setTimestamps, setReviewModal, setReviews, setSecurityFee } = globalActions
   const { apartment, timestamps, booked, reviews } = useSelector((states) => states.globalStates)
+  dispatch(setSecurityFee(securityFee))
 
   useEffect(() => {
     dispatch(setApartment(apartmentData))
@@ -84,12 +85,14 @@ export const getServerSideProps = async (context) => {
   const apartmentData = await getApartment(roomId)
   const timestampsData = await getBookedDates(roomId)
   const reviewsData = generateFakeReviews(5)
+  const securityFee = await getSecurityFee()
 
   return {
     props: {
       apartmentData: JSON.parse(JSON.stringify(apartmentData)),
       timestampsData: JSON.parse(JSON.stringify(timestampsData)),
       reviewsData: JSON.parse(JSON.stringify(reviewsData)),
+      securityFee: JSON.parse(JSON.stringify(securityFee)),
     },
   }
 }
