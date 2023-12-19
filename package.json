@@ -13,6 +13,12 @@
     "deploy": "yarn hardhat run scripts/deploy.js",
     "seed": "yarn hardhat run scripts/seed.js"
   },
+  "lint-staged": {
+    "./src/**/*.{ts,js,jsx,tsx}": [
+      "yarn lint --fix",
+      "yarn format"
+    ]
+  },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@rainbow-me/rainbowkit": "^1.0.10",
