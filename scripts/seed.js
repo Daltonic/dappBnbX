@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const toWei = (num) => ethers.parseEther(num.toString())
 
-const apartmentCount = 5
+const dataCount = 5
 const maxPrice = 3.5
 const imagesUrls = [
   'https://a0.muscache.com/im/pictures/miso/Hosting-3524556/original/24e9b114-7db5-4fab-8994-bc16f263ad1d.jpeg?im_w=720',
@@ -38,7 +38,7 @@ const shuffleArray = (array) => {
 }
 
 const generateFakeApartment = (count) => {
-  const apartmentCount = []
+  const apartments = []
   for (let i = 0; i < count; i++) {
     const id = i + 1
     const name = faker.word.words(5)
@@ -62,7 +62,7 @@ const generateFakeApartment = (count) => {
       images.push(shuffleArray(imagesUrls)[0])
     }
 
-    apartmentCount.push({
+    apartments.push({
       id,
       name,
       description,
@@ -76,7 +76,7 @@ const generateFakeApartment = (count) => {
     })
   }
 
-  return apartmentCount
+  return apartments
 }
 
 async function createApartments(contract, apartment) {
@@ -96,6 +96,8 @@ async function bookApartments(contract, aid, dates) {
   await tx.wait()
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 async function main() {
   let dappBnbContract
 
@@ -106,15 +108,25 @@ async function main() {
     dappBnbContract = await ethers.getContractAt('DappBnb', dappBnbAddress)
     const dates1 = [1678492800000, 1678579200000, 1678665600000]
 
-    // generateFakeApartment(apartmentCount).forEach(async (apartment) => {
-    //   await createApartments(dappBnbContract, apartment)
-    // })
+    // Process #1
+    await Promise.all(
+      generateFakeApartment(dataCount).map(async (apartment) => {
+        await createApartments(dappBnbContract, apartment)
+      })
+    )
 
-    // Array(apartmentCount)
-    //   .fill()
-    //   .forEach(async (booking, i) => {
-    //     await bookApartments(dappBnbContract, i + 1, dates1)
-    //   })
+    await delay(2500) // Wait for 2.5 seconds
+
+    // Process #2
+    await Promise.all(
+      Array(dataCount)
+        .fill()
+        .map(async (_, i) => {
+          await bookApartments(dappBnbContract, i + 1, dates1)
+        })
+    )
+
+    console.log('Items dummy data seeded...')
   } catch (error) {
     console.error('Unhandled error:', error)
   }
