@@ -4,7 +4,7 @@ import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { FaTimes } from 'react-icons/fa'
-import { getApartment, getBookedDates, updateApartment } from '@/services/blockchain'
+import { getApartment, updateApartment } from '@/services/blockchain'
 
 export default function Edit({ apartment }) {
   const { address } = useAccount()
@@ -219,11 +219,9 @@ export default function Edit({ apartment }) {
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
   const apartment = await getApartment(roomId)
-  const booked = await getBookedDates(roomId)
   return {
     props: {
-      apartment: JSON.parse(JSON.stringify(apartment)),
-      apartment: JSON.parse(JSON.stringify(apartment)),
+      apartment: JSON.parse(JSON.stringify(apartment))
     },
   }
 }

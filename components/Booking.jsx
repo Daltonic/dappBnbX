@@ -8,14 +8,6 @@ import { checkInApartment, refundBooking } from '@/services/blockchain'
 const Booking = ({ booking }) => {
   const { address } = useAccount()
 
-  //   useEffect(async () => {
-  //     const params = {
-  //       booking.aid,
-  //       bookingId: booking.id,
-  //     }
-  //     await hasBookedDateReached(params)
-  //   }, [])
-
   const handleCheckIn = async () => {
     await toast.promise(
       new Promise(async (resolve, reject) => {
