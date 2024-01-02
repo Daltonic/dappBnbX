@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/daltonic/Sites/dappBnbYT/contracts/DappBnbX.sol": {
-      "lastModificationDate": 1704198759417,
-      "contentHash": "1f19abdc56b306de6a95322197808727",
+      "lastModificationDate": 1704225640211,
+      "contentHash": "4e77155d51a4f22789d6a213adf7aba6",
       "sourceName": "contracts/DappBnbX.sol",
       "solcConfig": {
         "version": "0.8.19",

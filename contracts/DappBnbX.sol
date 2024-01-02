@@ -31,6 +31,7 @@ contract DappBnbX is Ownable, ReentrancyGuard {
     uint price;
     bool checked;
     bool cancelled;
+    bool abandoned;
   }
 
   struct ReviewStruct {
@@ -57,7 +58,7 @@ contract DappBnbX is Ownable, ReentrancyGuard {
     securityFee = _securityFee;
   }
 
-  function createAppartment(
+  function createApartment(
     string memory name,
     string memory description,
     string memory location,
@@ -89,7 +90,7 @@ contract DappBnbX is Ownable, ReentrancyGuard {
     apartments[apartment.id] = apartment;
   }
 
-  function updateAppartment(
+  function updateApartment(
     uint id,
     string memory name,
     string memory description,
@@ -118,7 +119,7 @@ contract DappBnbX is Ownable, ReentrancyGuard {
     apartments[apartment.id] = apartment;
   }
 
-  function deleteAppartment(uint id) public {
+  function deleteApartment(uint id) public {
     require(appartmentExist[id], 'Appartment not found');
     require(msg.sender == apartments[id].owner, 'Unauthorized entity');
 
@@ -217,6 +218,7 @@ contract DappBnbX is Ownable, ReentrancyGuard {
     require(!booking.checked, 'Already checked in');
     require(booking.date < currentTime(), 'Not allowed, booking date not exceeded');
 
+    bookingsOf[aid][bookingId].abandoned = true;
     uint tax = (booking.price * taxPercent) / 100;
     uint fee = (booking.price * securityFee) / 100;
 
