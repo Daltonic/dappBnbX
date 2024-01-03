@@ -8,7 +8,7 @@ const toWei = (num) => ethers.parseEther(num.toString())
 const fromWei = (num) => ethers.formatEther(num)
 
 let ethereum, tx
-const { setTimestamps, setBookings } = globalActions
+const { setTimestamps, setBookings, setReviews } = globalActions
 
 if (typeof window !== 'undefined') ethereum = window.ethereum
 
@@ -227,41 +227,69 @@ const claimFunds = async (aid, bookingId) => {
   }
 }
 
+const addReview = async (aid, comment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.addReview(aid, comment)
+
+    await tx.wait()
+    const reviews = await getReviews(aid)
+
+    store.dispatch(setReviews(reviews))
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const structureAppartments = (appartments) =>
-  appartments.map((apartment) => ({
-    id: Number(apartment.id),
-    name: apartment.name,
-    owner: apartment.owner,
-    description: apartment.description,
-    location: apartment.location,
-    price: fromWei(apartment.price),
-    deleted: apartment.deleted,
-    images: apartment.images.split(','),
-    rooms: Number(apartment.rooms),
-    timestamp: Number(apartment.timestamp),
-    booked: apartment.booked,
-  }))
+  appartments
+    .map((apartment) => ({
+      id: Number(apartment.id),
+      name: apartment.name,
+      owner: apartment.owner,
+      description: apartment.description,
+      location: apartment.location,
+      price: fromWei(apartment.price),
+      deleted: apartment.deleted,
+      images: apartment.images.split(','),
+      rooms: Number(apartment.rooms),
+      timestamp: Number(apartment.timestamp),
+      booked: apartment.booked,
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp)
 
 const structuredReviews = (reviews) =>
-  reviews.map((review) => ({
-    id: Number(review.id),
-    aid: Number(review.aid),
-    text: review.reviewText,
-    owner: review.owner,
-    timestamp: Number(review.timestamp),
-  }))
+  reviews
+    .map((review) => ({
+      id: Number(review.id),
+      aid: Number(review.aid),
+      text: review.reviewText,
+      owner: review.owner,
+      timestamp: Number(review.timestamp),
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp)
 
 const structuredBookings = (bookings) =>
-  bookings.map((booking) => ({
-    id: Number(booking.id),
-    aid: Number(booking.aid),
-    tenant: booking.tenant,
-    date: Number(booking.date),
-    price: fromWei(booking.price),
-    checked: booking.checked,
-    cancelled: booking.cancelled,
-    abandoned: booking.abandoned,
-  }))
+  bookings
+    .map((booking) => ({
+      id: Number(booking.id),
+      aid: Number(booking.aid),
+      tenant: booking.tenant,
+      date: Number(booking.date),
+      price: fromWei(booking.price),
+      checked: booking.checked,
+      cancelled: booking.cancelled,
+      abandoned: booking.abandoned,
+    }))
+    .sort((a, b) => b.date - a.date)
+    .reverse()
 
 export {
   getApartments,
@@ -278,4 +306,5 @@ export {
   checkInApartment,
   refundBooking,
   claimFunds,
+  addReview,
 }
