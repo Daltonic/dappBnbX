@@ -4,6 +4,7 @@ import { truncate } from '@/utils/helper'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
+import { createApartment } from '@/services/blockchain'
 
 export default function Add() {
   const { address } = useAccount()
@@ -31,16 +32,17 @@ export default function Add() {
 
     await toast.promise(
       new Promise(async (resolve, reject) => {
-        // await createApartment(params)
-        //   .then(async () => {
-        //     navigate.push('/')
-        //     resolve()
-        //   })
-        //   .catch(() => reject())
+        createApartment(params)
+          .then((tx) => {
+            console.log(tx)
+            navigate.push('/')
+            resolve(tx)
+          })
+          .catch(() => reject())
       }),
       {
         pending: 'Approve transaction...',
-        success: 'Apartment added successfully 👌',
+        success: 'Apartment created successfully 👌',
         error: 'Encountered error 🤯',
       }
     )

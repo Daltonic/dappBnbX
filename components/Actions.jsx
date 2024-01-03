@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { CiEdit } from 'react-icons/ci'
 import { MdDeleteOutline } from 'react-icons/md'
 import { toast } from 'react-toastify'
+import { deleteApartment } from '@/services/blockchain'
 
 const Actions = ({ apartment }) => {
   const navigate = useRouter()
@@ -13,12 +14,13 @@ const Actions = ({ apartment }) => {
     if (confirm(`Are you sure you want to delete Apartment ${apartment?.id}?`)) {
       await toast.promise(
         new Promise(async (resolve, reject) => {
-          // await deleteApartment(apartment?.id)
-          //   .then(async () => {
-          //     navigate.push('/')
-          //     resolve()
-          //   })
-          //   .catch(() => reject())
+          await deleteApartment(apartment?.id)
+            .then((tx) => {
+              console.log(tx)
+              navigate.push('/')
+              resolve(tx)
+            })
+            .catch(() => reject())
         }),
         {
           pending: 'Approve transaction...',

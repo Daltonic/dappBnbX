@@ -69,6 +69,75 @@ const getSecurityFee = async () => {
   return Number(fee)
 }
 
+const createApartment = async (apartment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.createApartment(
+      apartment.name,
+      apartment.description,
+      apartment.location,
+      apartment.images,
+      apartment.rooms,
+      toWei(apartment.price)
+    )
+
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const updateApartment = async (apartment) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.updateApartment(
+      apartment.id,
+      apartment.name,
+      apartment.description,
+      apartment.location,
+      apartment.images,
+      apartment.rooms,
+      toWei(apartment.price)
+    )
+
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
+const deleteApartment = async (id) => {
+  if (!ethereum) {
+    reportError('Please install a browser provider')
+    return Promise.reject(new Error('Browser provider not installed'))
+  }
+
+  try {
+    const contract = await getEthereumContracts()
+    tx = await contract.deleteApartment(id)
+
+    await tx.wait()
+    return Promise.resolve(tx)
+  } catch (error) {
+    reportError(error)
+    return Promise.reject(error)
+  }
+}
+
 const structureAppartments = (appartments) =>
   appartments.map((apartment) => ({
     id: Number(apartment.id),
@@ -112,5 +181,8 @@ export {
   getBookings,
   getQualifiedReviewers,
   getBookedDates,
-  getSecurityFee
+  getSecurityFee,
+  updateApartment,
+  createApartment,
+  deleteApartment
 }
