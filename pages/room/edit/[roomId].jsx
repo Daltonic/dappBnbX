@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { FaTimes } from 'react-icons/fa'
 import { truncate } from '@/utils/helper'
-import { generateFakeApartment } from '@/utils/fakeData'
+import { getApartment } from '@/services/blockchain'
 
 export default function Edit({ apartment }) {
   const { address } = useAccount()
@@ -218,7 +218,7 @@ export default function Edit({ apartment }) {
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartment = generateFakeApartment(roomId)[0]
+  const apartment = await getApartment(roomId)
   return {
     props: {
       apartment: JSON.parse(JSON.stringify(apartment)),

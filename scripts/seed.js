@@ -115,11 +115,11 @@ async function main() {
     const dates = [1707225263613, 1707225282094, 1707225296144]
 
     // Process #1
-    // await Promise.all(
-    //   generateFakeApartment(dataCount).map(async (apartment) => {
-    //     await createApartments(dappBnbXContract, apartment)
-    //   })
-    // )
+    await Promise.all(
+      generateFakeApartment(dataCount).map(async (apartment) => {
+        await createApartments(dappBnbXContract, apartment)
+      })
+    )
 
     // await delay(2500)
 

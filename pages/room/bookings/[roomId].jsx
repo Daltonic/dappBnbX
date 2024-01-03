@@ -1,6 +1,6 @@
 import { Booking } from '@/components'
 import { useRouter } from 'next/router'
-import { generateFakeApartment, generateFakeBookings } from '@/utils/fakeData'
+import { getApartment, getBookings } from '@/services/blockchain'
 
 const Bookings = ({ apartmentData, bookingsData }) => {
   const router = useRouter()
@@ -24,8 +24,8 @@ export default Bookings
 
 export const getServerSideProps = async (context) => {
   const { roomId } = context.query
-  const apartmentData = generateFakeApartment(roomId)[0]
-  const bookingsData = generateFakeBookings(5)
+  const apartmentData = await getApartment(roomId)
+  const bookingsData = await getBookings(roomId)
 
   return {
     props: {
