@@ -1,12 +1,18 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { FaTimes } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { globalActions } from '@/store/globalSlices'
 
 const AddReview = ({ roomId }) => {
   const [reviewText, setReviewText] = useState('')
-  const reviewModal = 'scale-0'
+  const { reviewModal } = useSelector((states) => states.globalStates)
+  const dispatch = useDispatch()
+  const { setReviewModal } = globalActions
 
-  const closeModal = () => {}
+  const closeModal = () => {
+    dispatch(setReviewModal('scale-0'))
+  }
 
   const resetForm = () => {
     setReviewText('')

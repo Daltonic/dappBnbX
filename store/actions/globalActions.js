@@ -1,5 +1,5 @@
 export const globalActions = {
-  setApartment: (state, action) => {
+  setApartments: (state, action) => {
     state.apartments = action.payload
   },
   setApartment: (state, action) => {

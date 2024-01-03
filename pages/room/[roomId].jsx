@@ -9,6 +9,9 @@ import {
   getSecurityFee,
 } from '@/services/blockchain'
 import { Title, ImageGrid, Description, Calendar, Actions, Review, AddReview } from '@/components'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { globalActions } from '@/store/globalSlices'
 
 export default function Room({
   apartmentData,
@@ -17,14 +20,28 @@ export default function Room({
   securityFee,
   qualifiedReviewers,
 }) {
+  const dispatch = useDispatch()
+  const { apartment, timestamps, reviews } = useSelector((states) => states.globalStates)
+  const { setApartment, setTimestamps, setReviews, setSecurityFee, setReviewModal } = globalActions
+
   const router = useRouter()
   const { roomId } = router.query
   const { address } = useAccount()
-  const apartment = apartmentData
-  const timestamps = timestampsData
-  const reviews = reviewsData
 
-  const handleReviewOpen = () => {}
+  useEffect(() => {
+    dispatch(setApartment(apartmentData))
+    dispatch(setTimestamps(timestampsData))
+    dispatch(setReviews(reviewsData))
+    dispatch(setSecurityFee(securityFee))
+  }, [
+    dispatch,
+    setApartment,
+    setTimestamps,
+    setReviews,
+    apartmentData,
+    timestampsData,
+    reviewsData,
+  ])
 
   return (
     <>
@@ -54,7 +71,7 @@ export default function Room({
             {qualifiedReviewers?.includes(address) && (
               <button
                 className="cursor-pointer text-pink-500 hover:text-pink-700"
-                onClick={handleReviewOpen}
+                onClick={() => dispatch(setReviewModal('scale-100'))}
               >
                 Drop your review
               </button>
