@@ -2,7 +2,6 @@ const { expect } = require('chai')
 const { ethers } = require('hardhat')
 
 const toWei = (num) => ethers.parseEther(num.toString())
-const fromWei = (num) => ethers.formatEther(num)
 
 const dates1 = [1707225263613, 1707225282094, 1707225296144]
 
