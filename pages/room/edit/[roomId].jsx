@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { truncate } from '@/store'
+import { truncate } from '@/utils/helper'
 import { useAccount } from 'wagmi'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
@@ -48,14 +48,16 @@ export default function Edit({ apartment }) {
     )
   }
 
-  const addImage = () => {
+  const addImage = (e) => {
+    e.preventDefault()
     if (links.length != 5) {
       setLinks((prevState) => [...prevState, images])
     }
     setImages('')
   }
 
-  const removeImage = (index) => {
+  const removeImage = (e, index) => {
+    e.preventDefault()
     links.splice(index, 1)
     setLinks(() => [...links])
   }
@@ -112,7 +114,7 @@ export default function Edit({ apartment }) {
 
             {links.length != 5 && (
               <button
-                onClick={addImage}
+                onClick={(e) => addImage(e)}
                 type="button"
                 className="p-2 bg-[#ff385c] text-white rounded-full text-sm"
               >
@@ -134,7 +136,7 @@ export default function Edit({ apartment }) {
               >
                 <span>{truncate(link, 4, 4, 11)}</span>
                 <button
-                  onClick={() => removeImage(i)}
+                  onClick={(e) => removeImage(e, i)}
                   type="button"
                   className="bg-transparent hover focus:outline-none"
                 >
@@ -221,7 +223,7 @@ export const getServerSideProps = async (context) => {
   const apartment = await getApartment(roomId)
   return {
     props: {
-      apartment: JSON.parse(JSON.stringify(apartment))
+      apartment: JSON.parse(JSON.stringify(apartment)),
     },
   }
 }

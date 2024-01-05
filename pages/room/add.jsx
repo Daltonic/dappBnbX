@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FaTimes } from 'react-icons/fa'
-import { truncate } from '@/store'
+import { truncate } from '@/utils/helper'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
