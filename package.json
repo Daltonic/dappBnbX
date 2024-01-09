@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "blockchain": "yarn hardhat node",
+    "deploy": "yarn hardhat run scripts/deploy.js",
+    "seed": "yarn hardhat run scripts/seed.js"
   },
   "lint-staged": {
     "./src/**/*.{ts,js,jsx,tsx}": [
